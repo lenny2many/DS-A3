@@ -1,9 +1,13 @@
+package paxos.participants;
+
+import paxos.messages.*;
+
 /**
- * Represents the abstract Paxos Participant.
+ * Represents the interface of a Paxos Participant.
  */
-abstract class PaxosParticipant {
-    protected int id;
-    protected PaxosMessageQueue messageQueue;
+interface PaxosParticipant {
+    public int id = 0;
+    public PaxosMessageQueue messageQueue = null;
 
     /**
      * Process incoming message.

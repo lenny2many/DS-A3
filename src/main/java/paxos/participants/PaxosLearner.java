@@ -1,3 +1,5 @@
+package paxos.participants;
+
 /**
  * Represents the Paxos Learner.
  */
