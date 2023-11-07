@@ -1,7 +1,7 @@
 package paxos.participants;
 
 import paxos.messages.PaxosMessage;
-import paxos.messages.PaxosMessageQueue;
+import paxos.network.PaxosMessageQueue;
 
 import java.util.logging.*;
 
@@ -10,7 +10,7 @@ import java.util.logging.*;
  */
 public class PaxosProposer implements PaxosParticipant {
     public int id = 0;
-    public PaxosMessageQueue messageQueue = null;
+    public MessageQueue messageQueue = null;
     
     private static final Logger logger = Logger.getLogger(PaxosProposer.class.getName());
 
@@ -57,7 +57,10 @@ public class PaxosProposer implements PaxosParticipant {
      * Send message to another participant.
      * @param message The PaxosMessage to be sent.
      */
-    public void send(PaxosMessage message) { }
+    public void send(PaxosMessage message, int acceptorId) {
+        logger.info("Proposer " + this.id + " sending message " + message.getType() + " to acceptor " + acceptorId + ".");
+        // Send message to acceptor over network.
+    }
 
     /**
      * Get the current proposal number.

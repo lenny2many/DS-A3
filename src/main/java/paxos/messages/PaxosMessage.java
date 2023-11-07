@@ -31,6 +31,25 @@ public class PaxosMessage {
     }
 
     /**
+     * Convert a string representation of a message into a PaxosMessage object.
+     * @return The string representation of the message.
+     */
+    public static PaxosMessage parseMessageFromString(String messageString) {
+        // Split the string by a delimiter to extract the different parts
+        // This is just an example; you'll need to adapt it based on your message format
+        String[] parts = messageString.split(";");
+        if (parts.length != 3) {
+            throw new IllegalArgumentException("Invalid message format");
+        }
+
+        String type = parts[0];
+        int proposalNumber = Integer.parseInt(parts[1]);
+        Object value = parts[2];
+
+        return new PaxosMessage(type, proposalNumber, value);
+    }
+
+    /**
      * Get the type of the message.
      * @return The type of the message.
      */

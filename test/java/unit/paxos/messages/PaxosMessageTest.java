@@ -30,6 +30,9 @@ public class PaxosMessageTest {
         logMessages.forEach(System.out::println);
     }
 
+    /**
+     * Test to ensure the proposal number is set correctly for a PaxosMessage.
+     */
     @Test
     public void testMessageProposalNumber() {
         logMessages.add("\n--- TEST: testMessageProposalNumber ---\n");
@@ -51,6 +54,9 @@ public class PaxosMessageTest {
         }
     }
 
+    /**
+     * Test to ensure the value is set correctly for a PaxosMessage.
+     */
     @Test
     public void testMessageValue() {
         logMessages.add("\n--- TEST: testMessageValue ---\n");
@@ -72,7 +78,9 @@ public class PaxosMessageTest {
         }
     }
 
-
+    /**
+     * Test to ensure the type is set correctly for a PaxosMessage.
+     */
     @Test
     public void testAllMessageTypes() {
         logMessages.add("\n--- TEST: testAllMessageTypes ---\n");
@@ -97,13 +105,15 @@ public class PaxosMessageTest {
         }
     }
 
+    /**
+     * Test to ensure an IllegalArgumentException is thrown for an invalid message type when new PaxosMessage is created.
+     */
     @Test
     public void testInvalidMessageType() {
         logMessages.add("\n--- TEST: testInvalidMessageType ---\n");
 
         String expectedType = "INVALID_TYPE";
         
-
         try {
             // The following line should throw an IllegalArgumentException.
             PaxosMessage message = new PaxosMessage(expectedType, 1, "SomeValue");
