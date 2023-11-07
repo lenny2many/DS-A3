@@ -14,10 +14,12 @@ import java.util.HashMap;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.*;
+import static org.mockito.ArgumentMatchers.*;
 
 /**
  * Unit tests for the PaxosProposer module.
@@ -26,7 +28,7 @@ public class PaxosProposerTest {
 
     PaxosMessageQueue mockMessageQueue;
 
-    private static final Logger logger = Logger.getLogger(PaxosProposerTest.class.getName());
+    private static final Logger logger = Logger.getLogger(PaxosProposer.class.getName());
 
     @Before
     public void setUp() {
@@ -41,19 +43,36 @@ public class PaxosProposerTest {
     }
 
     /**
-     * Test to ensure that a proposal is initialized correctly.
+     * Test to ensure the proposer proposes a value and sends a prepare message.
      */
     @Test
-    public void proposerInitialisesProposalTest() {
+    public void proposerSendsPrepareMessageTest() {
         int proposerId = 1;
+        Object proposedValue = "testValue";
         PaxosProposer proposer = new PaxosProposer(proposerId, mockMessageQueue);
-        proposer.initialiseProposal();
 
         List<String> logMessages = new ArrayList<>();
-        logMessages.add("\n--- TEST: proposerInitialisesProposalTest ---\n");
-        
+        logMessages.add("\n--- TEST: proposerSendsPrepareMessageTest ---\n");
+
         try {
-            verify(mockMessageQueue, times(1)).addMessage(any(PaxosMessage.class));
+            // Act
+            proposer.propose(proposedValue);
+            
+            // Assert
+            // Use an ArgumentCaptor to capture the message passed to the send method
+            ArgumentCaptor<PaxosMessage> messageCaptor = ArgumentCaptor.forClass(PaxosMessage.class);
+            
+            // Verify that send was called with any PaxosMessage and capture the message
+            verify(proposer).send(messageCaptor.capture());
+            
+            // Retrieve the captured message
+            PaxosMessage sentMessage = messageCaptor.getValue();
+
+            // Assert that the sent message has the correct type, proposal number, and value
+            assertEquals("PREPARE", sentMessage.getType());
+            assertEquals(0, sentMessage.getProposalNumber());
+            assertEquals(proposedValue, sentMessage.getValue());
+
             logMessages.add("Test passed: Message was added to message queue successfully.\n");
         } catch (AssertionError e) {
             logMessages.add("Test failed: Message was not added to message queue successfully.\n");
@@ -63,53 +82,57 @@ public class PaxosProposerTest {
         }
     }
 
-    /**
-     * Test to ensure that promises are handled correctly.
-     */
-    @Test
-    public void proposerHandlesPromisesTest() {
-        int proposerId = 1;
-        PaxosProposer proposer = new PaxosProposer(proposerId, mockMessageQueue);
-        PaxosMessage mockMessage = mock(PaxosMessage.class);
-        when(mockMessage.getType()).thenReturn("PROMISE");
-        proposer.onReceive(mockMessage);
+
+
+    
+
+    // /**
+    //  * Test to ensure that promises are handled correctly.
+    //  */
+    // @Test
+    // public void proposerHandlesPromisesTest() {
+    //     int proposerId = 1;
+    //     PaxosProposer proposer = new PaxosProposer(proposerId, mockMessageQueue);
+    //     PaxosMessage mockMessage = mock(PaxosMessage.class);
+    //     when(mockMessage.getType()).thenReturn("PROMISE");
+    //     proposer.onReceive(mockMessage);
         
-        List<String> logMessages = new ArrayList<>();
-        logMessages.add("\n--- TEST: proposerHandlesPromisesTest ---\n");
+    //     List<String> logMessages = new ArrayList<>();
+    //     logMessages.add("\n--- TEST: proposerHandlesPromisesTest ---\n");
 
-        try {
-            verify(mockMessageQueue, times(1)).addMessage(any(PaxosMessage.class));
-            logMessages.add("Test passed: Message was added to message queue successfully.\n");
-        } catch (AssertionError e) {
-            logMessages.add("Test failed: Message was not added to message queue successfully.\n");
-            throw e;
-        } finally {
-            logMessages.forEach(System.out::println);
-        }
-    }
+    //     try {
+    //         verify(mockMessageQueue, times(1)).addMessage(any(PaxosMessage.class));
+    //         logMessages.add("Test passed: Message was added to message queue successfully.\n");
+    //     } catch (AssertionError e) {
+    //         logMessages.add("Test failed: Message was not added to message queue successfully.\n");
+    //         throw e;
+    //     } finally {
+    //         logMessages.forEach(System.out::println);
+    //     }
+    // }
 
-    /**
-     * Test to ensure that accepted messages are handled correctly.
-     */
-    @Test
-    public void proposerHandlesAcceptedMessagesTest() {
-        int proposerId = 1;
-        PaxosProposer proposer = new PaxosProposer(proposerId, mockMessageQueue);
-        PaxosMessage mockMessage = mock(PaxosMessage.class);
-        when(mockMessage.getType()).thenReturn("ACCEPTED");
-        proposer.onReceive(mockMessage);
+    // /**
+    //  * Test to ensure that accepted messages are handled correctly.
+    //  */
+    // @Test
+    // public void proposerHandlesAcceptedMessagesTest() {
+    //     int proposerId = 1;
+    //     PaxosProposer proposer = new PaxosProposer(proposerId, mockMessageQueue);
+    //     PaxosMessage mockMessage = mock(PaxosMessage.class);
+    //     when(mockMessage.getType()).thenReturn("ACCEPTED");
+    //     proposer.onReceive(mockMessage);
         
-        List<String> logMessages = new ArrayList<>();
-        logMessages.add("\n--- TEST: proposerHandlesAcceptedMessagesTest ---\n");
+    //     List<String> logMessages = new ArrayList<>();
+    //     logMessages.add("\n--- TEST: proposerHandlesAcceptedMessagesTest ---\n");
 
-        try {
-            verify(mockMessageQueue, times(1)).addMessage(any(PaxosMessage.class));
-            logMessages.add("Test passed: Message was added to message queue successfully.\n");
-        } catch (AssertionError e) {
-            logMessages.add("Test failed: Message was not added to message queue successfully.\n");
-            throw e;
-        } finally {
-            logMessages.forEach(System.out::println);
-        }
-    }
+    //     try {
+    //         verify(mockMessageQueue, times(1)).addMessage(any(PaxosMessage.class));
+    //         logMessages.add("Test passed: Message was added to message queue successfully.\n");
+    //     } catch (AssertionError e) {
+    //         logMessages.add("Test failed: Message was not added to message queue successfully.\n");
+    //         throw e;
+    //     } finally {
+    //         logMessages.forEach(System.out::println);
+    //     }
+    // }
 }

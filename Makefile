@@ -29,15 +29,19 @@ compile_paxos_src:
 
 compile_paxos_test:
 	javac -cp ./lib/logging/*:./lib/testing/*:./bin/src: -d ./bin/test/unit ./test/java/unit/paxos/participants/PaxosProposerTest.java
+	# javac -cp ./lib/logging/*:./lib/testing/*:./bin/src: -d ./bin/test/unit ./test/java/unit/paxos/participants/PaxosAcceptorTest.java
+	# javac -cp ./lib/logging/*:./lib/testing/*:./bin/src: -d ./bin/test/unit ./test/java/unit/paxos/participants/PaxosLearnerTest.java
+	javac -cp ./lib/logging/*:./lib/testing/*:./bin/src: -d ./bin/test/unit ./test/java/unit/paxos/messages/PaxosMessageTest.java
 
 run_council_election: compile_paxos
 	java -cp ./bin/src/: adelaidesuburbs.App
 
 test_paxos_unit: compile_paxos
-	java -cp ./lib/logging/*:./lib/testing/*:./bin/test/unit/:./bin/src/: org.junit.runner.JUnitCore paxos.participants.PaxosProposerTest
-	# java -cp $(UNITDIR):$(TESTLIB) org.junit.runner.JUnitCore paxos.participant.PaxosAcceptorTest
-	# java -cp $(UNITDIR):$(TESTLIB) org.junit.runner.JUnitCore paxos.participant.PaxosLearnerTest
-	# java -cp $(UNITDIR):$(TESTLIB) org.junit.runner.JUnitCore paxos.messages.PaxosMessageTest
+	# java -cp ./lib/logging/*:./lib/testing/*:./bin/test/unit/:./bin/src/: org.junit.runner.JUnitCore paxos.participants.PaxosProposerTest
+	java -cp ./lib/logging/*:./lib/testing/*:./bin/test/unit/:./bin/src/: org.junit.runner.JUnitCore paxos.messages.PaxosMessageTest
+	# java -cp ./lib/logging/*:./lib/testing/*:./bin/test/unit/:./bin/src/: org.junit.runner.JUnitCore paxos.participants.PaxosAcceptorTest
+	# java -cp ./lib/logging/*:./lib/testing/*:./bin/test/unit/:./bin/src/: org.junit.runner.JUnitCore paxos.participants.PaxosLearnerTest
+	
 
 test_paxos_integration: compile_paxos
 

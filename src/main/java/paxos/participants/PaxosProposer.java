@@ -9,6 +9,8 @@ import java.util.logging.*;
  * Represents the Paxos Proposer.
  */
 public class PaxosProposer implements PaxosParticipant {
+    public int id = 0;
+    public PaxosMessageQueue messageQueue = null;
     
     private static final Logger logger = Logger.getLogger(PaxosProposer.class.getName());
 
@@ -17,20 +19,20 @@ public class PaxosProposer implements PaxosParticipant {
      * @param id The id of the proposer.
      * @param messageQueue The message queue of the proposer.
      */
-    public PaxosProposer(int id, PaxosMessageQueue messageQueue) { }
-
-    /**
-     * Initialise the proposal process.
-     */
-    public void initialiseProposal() { 
-        
+    public PaxosProposer(int id, PaxosMessageQueue messageQueue) {
+        this.id = id;
+        this.messageQueue = messageQueue;
     }
 
     /**
      * Begin the proposal process.
      * @param value The proposed value.
      */
-    public void propose(Object value) { }
+    public void propose(Object value) { 
+        logger.info("Proposer " + this.id + " proposing value " + value + ".");
+        PaxosMessage message = new PaxosMessage("PREPARE", 0, value);
+        this.send(message);
+    }
 
     /**
      * Handle promise messages from acceptors.
