@@ -1,5 +1,8 @@
 package paxos.messages;
 
+import java.util.Optional;
+import java.util.logging.*;
+
 /**
  * Represents a Paxos message passed between participants.
  */
@@ -7,6 +10,8 @@ public class PaxosMessage {
     private Type type;
     private int proposalNumber;
     private Object value;
+
+    private static final Logger LOGGER = Logger.getLogger(PaxosMessage.class.getName());
 
     /**
      * Enum for PaxosMessage types.
@@ -32,21 +37,49 @@ public class PaxosMessage {
 
     /**
      * Convert a string representation of a message into a PaxosMessage object.
+     * The expected message format is: <type>;<proposalNumber>;<value>
+     * For example: "PROPOSE;123;SomeValue"
+     * 
+     * @param messageString The string representation of the message.
      * @return The string representation of the message.
      */
-    public static PaxosMessage parseMessageFromString(String messageString) {
-        // Split the string by a delimiter to extract the different parts
-        // This is just an example; you'll need to adapt it based on your message format
+    public static Optional<PaxosMessage> parseMessageFromString(String messageString) {
         String[] parts = messageString.split(";");
         if (parts.length != 3) {
-            throw new IllegalArgumentException("Invalid message format");
+            LOGGER.warning("Invalid message format. Expected format: <type>;<proposalNumber>;<value>");
+            return Optional.empty();
         }
+    
+        String typeStr = parts[0];
+        if (!isValidType(typeStr)) {
+            LOGGER.warning("Invalid message type: " + typeStr);
+            return Optional.empty();
+        }
+    
+        int proposalNumber;
+        try {
+            proposalNumber = Integer.parseInt(parts[1]);
+        } catch (NumberFormatException e) {
+            LOGGER.warning("Proposal number must be an integer. Found: " + parts[1]);
+            return Optional.empty();
+        }
+    
+        String value = parts[2].trim();
+        if (value.isEmpty()) {
+            LOGGER.warning("Value cannot be empty.");
+            return Optional.empty();
+        }
+    
+        return Optional.of(new PaxosMessage(typeStr, proposalNumber, value));
+    }
 
-        String type = parts[0];
-        int proposalNumber = Integer.parseInt(parts[1]);
-        Object value = parts[2];
-
-        return new PaxosMessage(type, proposalNumber, value);
+    private static boolean isValidType(String typeStr) {
+        for (Type type : Type.values()) {
+            if (type.name().equals(typeStr)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**

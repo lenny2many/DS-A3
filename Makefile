@@ -5,7 +5,7 @@ SRCJFLAGS = -cp $(BINSRC):$(LOGLIB)
 
 SRCDIR = ./src/main/java
 
-UNITDIR = test/unit
+UNITDIR = test/java/unit
 INTEGRATIONDIR = test/integration
 
 all: compile
@@ -22,27 +22,53 @@ create_bin:
 compile_adelaidesuburbs: create_bin
 	javac $(SRCJFLAGS) -d ./bin/src/ $(SRCDIR)/adelaidesuburbs/App.java
 
-compile_paxos: create_bin compile_paxos_src compile_paxos_test
+compile_paxos: compile_paxos_src compile_paxos_test
 
-compile_paxos_src:
+
+# Source targets
+compile_paxos_src: compile_paxos_proposer compile_paxos_acceptor compile_paxos_learner compile_paxos_message
+
+compile_paxos_proposer: create_bin
 	javac -cp ./lib/logging/*:$(SRCDIR) -d ./bin/src/ $(SRCDIR)/paxos/participants/PaxosProposer.java
 
-compile_paxos_test: 
-	javac -cp ./lib/logging/*:./lib/testing/*:./bin/src: -d ./bin/test/unit ./test/java/unit/paxos/participants/PaxosProposerTest.java
-	# javac -cp ./lib/logging/*:./lib/testing/*:./bin/src: -d ./bin/test/unit ./test/java/unit/paxos/participants/PaxosAcceptorTest.java
-	# javac -cp ./lib/logging/*:./lib/testing/*:./bin/src: -d ./bin/test/unit ./test/java/unit/paxos/participants/PaxosLearnerTest.java
-	javac -cp ./lib/logging/*:./lib/testing/*:./bin/src: -d ./bin/test/unit ./test/java/unit/paxos/messages/PaxosMessageTest.java
+compile_paxos_acceptor: create_bin
+	javac -cp ./lib/logging/*:$(SRCDIR) -d ./bin/src/ $(SRCDIR)/paxos/participants/PaxosAcceptor.java
 
-run_council_election: compile_paxos
-	java -cp ./bin/src/: adelaidesuburbs.App
+compile_paxos_learner: create_bin
+	javac -cp ./lib/logging/*:$(SRCDIR) -d ./bin/src/ $(SRCDIR)/paxos/participants/PaxosLearner.java
 
-test_paxos_unit: compile_paxos
-	java -cp ./lib/logging/*:./lib/testing/*:./bin/test/unit/:./bin/src/: org.junit.runner.JUnitCore paxos.participants.PaxosProposerTest
-	# java -cp ./lib/logging/*:./lib/testing/*:./bin/test/unit/:./bin/src/: org.junit.runner.JUnitCore paxos.messages.PaxosMessageTest
-	# java -cp ./lib/logging/*:./lib/testing/*:./bin/test/unit/:./bin/src/: org.junit.runner.JUnitCore paxos.participants.PaxosAcceptorTest
-	# java -cp ./lib/logging/*:./lib/testing/*:./bin/test/unit/:./bin/src/: org.junit.runner.JUnitCore paxos.participants.PaxosLearnerTest
+compile_paxos_message: create_bin
+	javac -cp ./lib/logging/*:$(SRCDIR) -d ./bin/src/ $(SRCDIR)/paxos/messages/PaxosMessage.java
 
-test_paxos_integration: compile_paxos
 
+# Test targets
+compile_paxos_test: compile_paxos_test_proposer compile_paxos_test_acceptor compile_paxos_test_learner compile_paxos_test_message
+
+compile_paxos_test_proposer: create_bin compile_paxos_proposer
+	javac -cp $(TESTLIB):$(BINSRC) -d ./bin/test/unit $(UNITDIR)/paxos/participants/PaxosProposerTest.java
+
+compile_paxos_test_acceptor: create_bin compile_paxos_acceptor
+	javac -cp $(TESTLIB):$(BINSRC) -d ./bin/test/unit $(UNITDIR)/paxos/participants/PaxosAcceptorTest.java
+
+compile_paxos_test_learner: create_bin compile_paxos_learner
+	javac -cp $(TESTLIB):$(BINSRC) -d ./bin/test/unit $(UNITDIR)/paxos/participants/PaxosLearnerTest.java
+
+compile_paxos_test_message: create_bin compile_paxos_message
+	javac -cp $(TESTLIB):$(BINSRC) -d ./bin/test/unit $(UNITDIR)/paxos/messages/PaxosMessageTest.java
+
+test_paxos_unit_proposer: compile_paxos_test_proposer
+	java -cp $(TESTLIB):./bin/test/unit/:$(BINSRC) org.junit.runner.JUnitCore paxos.participants.PaxosProposerTest
+
+test_paxos_unit_acceptor: compile_paxos_test_acceptor
+	java -cp $(TESTLIB):./bin/test/unit/:$(BINSRC) org.junit.runner.JUnitCore paxos.participants.PaxosAcceptorTest
+
+test_paxos_unit_learner: compile_paxos_test_learner
+	java -cp $(TESTLIB):./bin/test/unit/:$(BINSRC) org.junit.runner.JUnitCore paxos.participants.PaxosLearnerTest
+
+test_paxos_unit_message: compile_paxos_test_message
+	java -cp $(TESTLIB):./bin/test/unit/:$(BINSRC) org.junit.runner.JUnitCore paxos.messages.PaxosMessageTest
+
+
+# Clean targets
 clean:
 	rm -rf ./bin

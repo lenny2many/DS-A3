@@ -2,6 +2,8 @@ package paxos.participants;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.logging.*;
 
 import paxos.messages.*;
 import paxos.network.*;
@@ -17,11 +19,13 @@ public abstract class PaxosParticipant {
     protected List<Node> nodes = new ArrayList<>();
     protected MessageQueue messageQueue = new MessageQueue();
     
+    private static final Logger logger = Logger.getLogger(PaxosParticipant.class.getName());
+
     /**
      * Constructor for PaxosParticipant.
-     * @param host The host of the participant.
      * @param serverPort The port for receiving messages.
      * @param clientPort The port for sending messages.
+     * @param nodes The list of nodes that this participant is connected to.
      */
     public PaxosParticipant(int serverPort, int clientPort, List<Node> nodes) {
         // Server for receiving messages
@@ -44,10 +48,15 @@ public abstract class PaxosParticipant {
                 while (!Thread.currentThread().isInterrupted()) {
                     // Wait for a message to be added to the queue
                     String messageString = this.messageQueue.consumeMessage();
-                    // Parse the message string into a PaxosMessage object
-                    PaxosMessage message = PaxosMessage.parseMessageFromString(messageString);
-                    // Process the message
-                    this.receiveMessage(message);
+                    // Parse the message
+                    Optional<PaxosMessage> messageOpt = PaxosMessage.parseMessageFromString(messageString);
+                    if (messageOpt.isPresent()) {
+                        PaxosMessage paxosMessage = messageOpt.get();
+                        // Process the message
+                        this.receiveMessage(paxosMessage);
+                    } else {
+                        logger.warning("Failed to parse message: " + messageString);
+                    }
                 }
             } catch (InterruptedException e) {
                 // Thread was interrupted during wait
