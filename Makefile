@@ -26,7 +26,10 @@ compile_paxos: compile_paxos_src compile_paxos_test
 
 
 # Source targets
-compile_paxos_src: compile_paxos_proposer compile_paxos_acceptor compile_paxos_learner compile_paxos_message
+compile_paxos_src: compile_paxos_participant compile_paxos_proposer compile_paxos_acceptor compile_paxos_learner compile_paxos_message
+
+compile_paxos_participant: create_bin
+	javac -cp ./lib/logging/*:$(SRCDIR) -d ./bin/src/ $(SRCDIR)/paxos/participants/PaxosParticipant.java
 
 compile_paxos_proposer: create_bin
 	javac -cp ./lib/logging/*:$(SRCDIR) -d ./bin/src/ $(SRCDIR)/paxos/participants/PaxosProposer.java
@@ -42,7 +45,10 @@ compile_paxos_message: create_bin
 
 
 # Test targets
-compile_paxos_test: compile_paxos_test_proposer compile_paxos_test_acceptor compile_paxos_test_learner compile_paxos_test_message
+compile_paxos_test: compile_paxos_test_participant compile_paxos_test_proposer compile_paxos_test_acceptor compile_paxos_test_learner compile_paxos_test_message
+
+compile_paxos_test_participant: create_bin compile_paxos_participant
+	javac -cp $(TESTLIB):$(BINSRC) -d ./bin/test/unit $(UNITDIR)/paxos/participants/PaxosParticipantTest.java
 
 compile_paxos_test_proposer: create_bin compile_paxos_proposer
 	javac -cp $(TESTLIB):$(BINSRC) -d ./bin/test/unit $(UNITDIR)/paxos/participants/PaxosProposerTest.java
@@ -55,6 +61,9 @@ compile_paxos_test_learner: create_bin compile_paxos_learner
 
 compile_paxos_test_message: create_bin compile_paxos_message
 	javac -cp $(TESTLIB):$(BINSRC) -d ./bin/test/unit $(UNITDIR)/paxos/messages/PaxosMessageTest.java
+
+test_paxos_unit_participant: compile_paxos_test_participant
+	java -cp $(TESTLIB):./bin/test/unit/:$(BINSRC) org.junit.runner.JUnitCore paxos.participants.PaxosParticipantTest
 
 test_paxos_unit_proposer: compile_paxos_test_proposer
 	java -cp $(TESTLIB):./bin/test/unit/:$(BINSRC) org.junit.runner.JUnitCore paxos.participants.PaxosProposerTest

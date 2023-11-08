@@ -9,7 +9,8 @@ import java.util.logging.*;
 public class PaxosMessage {
     private Type type;
     private int proposalNumber;
-    private Object value;
+    private String value;
+    private int senderID;
 
     private static final Logger LOGGER = Logger.getLogger(PaxosMessage.class.getName());
 
@@ -19,7 +20,7 @@ public class PaxosMessage {
     public enum Type {
         PREPARE,
         PROMISE,
-        ACCEPT_REQUEST,
+        ACCEPT,
         ACCEPTED
     }
 
@@ -29,7 +30,7 @@ public class PaxosMessage {
      * @param proposalNumber The proposal number.
      * @param value The proposed value.
      */
-    public PaxosMessage(String type, int proposalNumber, Object value) {
+    public PaxosMessage(String type, int proposalNumber, String value) {
         this.type = Type.valueOf(type);
         this.proposalNumber = proposalNumber;
         this.value = value;
@@ -44,6 +45,12 @@ public class PaxosMessage {
      * @return The string representation of the message.
      */
     public static Optional<PaxosMessage> parseMessageFromString(String messageString) {
+        // Ensure message is not empty or null
+        if (messageString == null || messageString.isEmpty()) {
+            LOGGER.warning("Message cannot be empty.");
+            return Optional.empty();
+        }
+
         String[] parts = messageString.split(";");
         if (parts.length != 3) {
             LOGGER.warning("Invalid message format. Expected format: <type>;<proposalNumber>;<value>");
@@ -83,6 +90,14 @@ public class PaxosMessage {
     }
 
     /**
+     * Convert the message to a string representation.
+     * @return The string representation of the message.
+     */
+    public String toString() {
+        return type + ";" + proposalNumber + ";" + value;
+    }
+
+    /**
      * Get the type of the message.
      * @return The type of the message.
      */
@@ -102,7 +117,15 @@ public class PaxosMessage {
      * Get the proposed value.
      * @return The proposed value.
      */
-    public Object getValue() {
+    public String getValue() {
         return value;
+    }
+
+    /**
+     * Get the sender ID.
+     * @return The sender ID.
+     */
+    public int getSenderID() {
+        return senderID;
     }
 }

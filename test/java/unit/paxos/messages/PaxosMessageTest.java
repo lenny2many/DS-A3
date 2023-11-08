@@ -90,7 +90,7 @@ public class PaxosMessageTest {
 
         boolean passed = true;
 
-        String[] expectedTypes = {"PREPARE", "PROMISE", "ACCEPT_REQUEST", "ACCEPTED"};
+        String[] expectedTypes = {"PREPARE", "PROMISE", "ACCEPT", "ACCEPTED"};
 
         for (String expectedType : expectedTypes) {
 
