@@ -1,14 +1,10 @@
 # Paxos Election System Testing Guide
 ## Introduction
-This document outlines the testing strategy, scenarios, and results for the Paxos Election System used in the Adelaide Suburbs Council Election.
-
-## Testing Strategy
-Our testing strategy ensures that the Paxos algorithm, as adapted for our election scenario, functions reliably and handles edge cases, member behaviors, and potential communication interruptions.
+This document outlines the integration tests conducted on the Paxos algorithm implementation within the Adelaide Suburbs Council Election system. The tests are designed to ensure the reliability and correctness of the Paxos protocol under various scenarios, particularly focusing on the election process involving multiple council members.
 
 ### Testing Tools & Frameworks:
 - **JUnit:** For unit and integration testing of the Java codebase.
-- **Mockito:** For mocking objects and testing in isolation.
-- **Log4j:** To generate logs that can be analyzed post-test for any unexpected behavior.
+- **Java Util Logging:** To generate logs that can be analysed post-test for any unexpected behavior.
 
 ## Test Scenarios
 ### Unit Tests:
@@ -31,20 +27,36 @@ Our testing strategy ensures that the Paxos algorithm, as adapted for our electi
 - Test thread-safe exchange of messages between participants.
 
 ### Integration Tests:
-`Basic Consensus Achievement`<br>
-- Simulate a straightforward election where all members respond promptly.
+The integration tests cover four primary scenarios:
 
-`Simultaneous Proposals`<br>
-- Simulate scenarios where two councillors send voting proposals simultaneously.
+**1. Immediate Response with One Proposer**<br>
+**2. Various Delay Responses with One Proposer**<br>
+**3. Two Proposers Proposing Concurrently**<br>
+**4. Two Proposers with Various Delays**<br>
 
-`Varying Response Times`<br>
-- Introduce artificial delays to mimic behaviors of M1, M2, and M3.
+`1. Immediate Response with One Proposer`<br>
+- **Objective:** Validate the election process when one council member proposes and all members (including proposer) respond immediately.
+- **Log File:** testImmediateResponseOneProposer.log<br>
+![Alt text](image.png)<br>
+**Logfile link:** https://github.com/lenny2many/DS-A3/tree/main/logs/testImmediateResponseOneProposer.log
 
-`Offline Proposers`<br>
-- Test scenarios where proposers like M2 or M3 go offline post-proposal.
+`2. Various Delay Responses with One Proposer`<br>
+- **Objective:**: Assess the system's behavior when one council member proposes and other members respond with varying delays.
+- **Log File:** testVariousDelaysOneProposer.log<br>
+![Alt text](image-3.png)<br>
+**Logfile link:** https://github.com/lenny2many/DS-A3/tree/main/src/main/logs/testVariousDelaysOneProposer.log
 
-`Network Interruptions`<br>
-- Simulate message drops and network delays to ensure the robustness of the algorithm.
+`3. Two Proposers Proposing Concurrently`<br>
+- **Objective:**: Test the system's stability and correctness when two proposers initiate the election process simultaneously under immediate response conditions.
+- **Log File:** testTwoProposersConcurrent.log<br>
+![Alt text](image-1.png)<br>
+**Logfile link:** https://github.com/lenny2many/DS-A3/tree/main/src/main/logs/testTwoProposersConcurrent.log
 
-## Testing Results
-After running the aforementioned scenarios:
+`4. Two Proposers with Various Delays`<br>
+- **Objective:**: Evaluate the system's performance and conflict resolution when two proposers initiate the election process simultaneously, with other members responding with various delays.
+- **Log File:** testTwoProposersConcurrentVariousDelays.log<br>
+![Alt text](image-2.png)<br>
+**Logfile link:** https://github.com/lenny2many/DS-A3/tree/main/src/main/logs/testTwoProposersConcurrentVariousDelays.log
+
+### To re-run the integration tests and get the exact same results. use the following command (refer to README.md in root to learn about makefile):<br>
+- `make test_paxos_integration`

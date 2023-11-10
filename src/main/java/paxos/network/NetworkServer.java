@@ -41,7 +41,6 @@ public class NetworkServer implements Runnable {
                 clientSocket = this.serverSocket.accept();
             } catch (IOException e) {
                 if (isStopped()) {
-                    System.out.println("Server Stopped.");
                     break;
                 }
                 throw new RuntimeException("Error accepting client connection", e);
@@ -132,8 +131,7 @@ public class NetworkServer implements Runnable {
                     }
                 }
             } catch (IOException e) {
-                System.err.println("Exception caught when trying to listen on port or listening for a connection");
-                System.err.println(e.getMessage());
+                logger.severe("Error handling client connection");
             }
         }
     }

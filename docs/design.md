@@ -14,9 +14,6 @@ Handles initiating the proposal process for council president elections.
 `PaxosAcceptor`<br>
 Processes proposals from PaxosProposer and sends promises and accepted messages accordingly.
 
-`PaxosLearner`<br>
-Collects accepted messages from PaxosAcceptor to determine and notify of a consensus achievement.
-
 ### 2. Paxos Messages
 Messages used for communication among participants.
 

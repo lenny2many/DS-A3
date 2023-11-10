@@ -17,9 +17,6 @@ Each participant extends the PaxosParticipant abstract class, ensuring a common 
 - Sends promises if the received proposal number is higher than any seen before.
 - Sends accepted messages once an accept request is received and validated.
 
-`PaxosLearner`<br>
-- Collects accepted messages and determines when a consensus is achieved.
-
 ### Paxos Messages
 Messages are implemented as objects with types (`PREPARE`, `PROMISE`, `ACCEPT`, `ACCEPTED`).
 

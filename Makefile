@@ -7,7 +7,7 @@ TESTJFLAGS = -cp $(TESTLIB):$(BINSRC)
 SRCDIR = ./src/main/java
 
 UNITDIR = test/java/unit
-INTEGRATIONDIR = test/integration
+INTEGRATIONDIR = test/java/integration
 
 all: compile
 
@@ -27,7 +27,7 @@ compile_paxos: compile_paxos_src compile_paxos_test
 
 
 # Source targets
-compile_paxos_src: compile_paxos_participant compile_paxos_proposer compile_paxos_acceptor compile_paxos_learner compile_paxos_message
+compile_paxos_src: compile_paxos_participant compile_paxos_proposer compile_paxos_acceptor compile_paxos_message
 
 compile_paxos_participant: create_bin
 	javac $(SRCJFLAGS) -d ./bin/src/ $(SRCDIR)/paxos/participants/PaxosParticipant.java
@@ -38,31 +38,30 @@ compile_paxos_proposer: create_bin
 compile_paxos_acceptor: create_bin
 	javac $(SRCJFLAGS) -d ./bin/src/ $(SRCDIR)/paxos/participants/PaxosAcceptor.java
 
-compile_paxos_learner: create_bin
-	javac $(SRCJFLAGS) -d ./bin/src/ $(SRCDIR)/paxos/participants/PaxosLearner.java
-
 compile_paxos_message: create_bin
 	javac $(SRCJFLAGS) -d ./bin/src/ $(SRCDIR)/paxos/messages/PaxosMessage.java
 
 
 # Test targets
-compile_paxos_test: compile_paxos_test_participant compile_paxos_test_proposer compile_paxos_test_acceptor compile_paxos_test_learner compile_paxos_test_message
+compile_paxos_test: compile_paxos_test_integration compile_paxos_test_participant compile_paxos_test_proposer compile_paxos_test_acceptor compile_paxos_test_message
 
 compile_paxos_test_participant: create_bin compile_paxos_participant
-	javac -cp $(TESTJFLAGS) -d ./bin/test/unit $(UNITDIR)/paxos/participants/PaxosParticipantTest.java
+	javac $(TESTJFLAGS):$(SRCDIR) -d ./bin/test/unit $(UNITDIR)/paxos/participants/PaxosParticipantTest.java
 
 compile_paxos_test_proposer: create_bin compile_paxos_proposer
-	javac -cp $(TESTJFLAGS) -d ./bin/test/unit $(UNITDIR)/paxos/participants/PaxosProposerTest.java
+	javac $(TESTJFLAGS):$(SRCDIR) -d ./bin/test/unit $(UNITDIR)/paxos/participants/PaxosProposerTest.java
 
 compile_paxos_test_acceptor: create_bin compile_paxos_acceptor
-	javac -cp $(TESTJFLAGS) -d ./bin/test/unit $(UNITDIR)/paxos/participants/PaxosAcceptorTest.java
-
-compile_paxos_test_learner: create_bin compile_paxos_learner
-	javac -cp $(TESTJFLAGS) -d ./bin/test/unit $(UNITDIR)/paxos/participants/PaxosLearnerTest.java
+	javac $(TESTJFLAGS):$(SRCDIR) -d ./bin/test/unit $(UNITDIR)/paxos/participants/PaxosAcceptorTest.java
 
 compile_paxos_test_message: create_bin compile_paxos_message
-	javac -cp $(TESTJFLAGS) -d ./bin/test/unit $(UNITDIR)/paxos/messages/PaxosMessageTest.java
+	javac $(TESTJFLAGS):$(SRCDIR) -d ./bin/test/unit $(UNITDIR)/paxos/messages/PaxosMessageTest.java
 
+compile_paxos_test_integration: compile_adelaidesuburbs
+	javac $(TESTJFLAGS):$(SRCDIR) -d ./bin/test/integration $(INTEGRATIONDIR)/PaxosIntegrationTests.java
+
+
+# Test run targets
 test_paxos_unit_participant: compile_paxos_test_participant
 	java -cp $(TESTLIB):./bin/test/unit/:$(BINSRC) org.junit.runner.JUnitCore paxos.participants.PaxosParticipantTest
 
@@ -78,6 +77,10 @@ test_paxos_unit_learner: compile_paxos_test_learner
 test_paxos_unit_message: compile_paxos_test_message
 	java -cp $(TESTLIB):./bin/test/unit/:$(BINSRC) org.junit.runner.JUnitCore paxos.messages.PaxosMessageTest
 
+
+
+test_paxos_integration: compile_adelaidesuburbs compile_paxos_test_integration
+	java -cp $(TESTLIB):./bin/test/integration/:$(BINSRC) org.junit.runner.JUnitCore integration.PaxosIntegrationTests
 
 # Run targets
 run_council_election: compile_adelaidesuburbs

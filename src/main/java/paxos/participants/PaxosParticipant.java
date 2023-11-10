@@ -18,6 +18,7 @@ import paxos.network.MessageQueue.ClientMessage;
 public abstract class PaxosParticipant {
     protected NetworkServer server;
     protected Node serverNode;
+    protected int participantID;
     protected DelayProfile delayProfile;
     protected List<Node> nodes = new ArrayList<>();
     protected MessageQueue messageQueue;
@@ -31,10 +32,13 @@ public abstract class PaxosParticipant {
      * @param clientPort The port for sending messages.
      * @param nodes The list of nodes that this participant is connected to.
      */
-    public PaxosParticipant(Node serverNode, List<Node> nodes) {}
+    public PaxosParticipant(Node serverNode, List<Node> nodes) {
+        this.participantID = Integer.parseInt(serverNode.getNodeName().substring(1));
+    }
 
     public PaxosParticipant(Node serverNode, List<Node> nodes, DelayProfile delayProfile) {
         this.delayProfile = delayProfile;
+        this.participantID = Integer.parseInt(serverNode.getNodeName().substring(1));
     }
 
     /**
@@ -94,6 +98,11 @@ public abstract class PaxosParticipant {
         }
     }
 
+    public void stop() {
+        this.stopMessageProcessingThread();
+        this.server.stop();
+    }
+
     public abstract void receiveMessage(PaxosMessage message, String participantID);
 
     /**
@@ -136,6 +145,19 @@ public abstract class PaxosParticipant {
             default:
                 // No delay
                 break;
+        }
+    }
+
+    // Use composite proposal number to ensure that the proposer with the highest proposal number is chosen
+    protected boolean compareProposalNumbers(int proposalNumber1, int proposalNumber2, int ID1, int ID2) {
+        // Compare the proposal numbers
+        if (proposalNumber1 > proposalNumber2) {
+            return true;
+        } else if (proposalNumber1 == proposalNumber2) {
+            // If the proposal numbers are equal, compare the proposer IDs
+            return ID1 > ID2;
+        } else {
+            return false;
         }
     }
 

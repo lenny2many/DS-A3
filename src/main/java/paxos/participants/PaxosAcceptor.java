@@ -108,10 +108,6 @@ public class PaxosAcceptor extends PaxosParticipant {
             sendMessage(accepted, sender.getHost(), sender.getProposerPort());
             logger.info("NODE " + serverNode.getNodeName() + ": " + "Sent accepted message with proposal number: " + acceptMessage.getProposalNumber() + " and value: " + acceptMessage.getValue() + " to proposer " + participantID);
 
-            // This is simplified; in an actual implementation, you might send it to a specific set of nodes.
-            // for (Node node : this.nodes) {
-            //     sendMessage(accepted, sender.getHost(), sender.getAcceptorPort());
-            // }
         }
     }
 

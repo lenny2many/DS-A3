@@ -26,6 +26,8 @@ public class PaxosProposer extends PaxosParticipant {
     // Proposal value to be accepted (may be updated based on promises received)
     private String proposedValue;
     private int lastProposalNumberUsed = 0;
+    
+    private String acceptedValue = "";
 
     private static final Logger logger = Logger.getLogger(PaxosProposer.class.getName());
 
@@ -84,6 +86,8 @@ public class PaxosProposer extends PaxosParticipant {
         // Start server thread
         this.startMessageProcessingThread();
     }
+
+    
 
     /**
      * Sends a prepare request to all acceptors.
@@ -185,8 +189,6 @@ public class PaxosProposer extends PaxosParticipant {
             // If the acceptances have reached a quorum, the proposal is chosen
             if (hasReachedQuorum(acceptances)) {
                 logger.info("NODE " + serverNode.getNodeName() + ": " + "Received a quorum of acceptances for proposal number " + this.highestProposalNumberSeen + ". Proposal chosen.");
-                // Set the commit phase initiated flag
-                this.commitPhaseInitiated = true;
                 // The value is now chosen; notify all nodes and perform any additional logic required
                 onProposalChosen(acceptedMessage.getValue());
             }
@@ -196,14 +198,12 @@ public class PaxosProposer extends PaxosParticipant {
         }
     }
 
-    // This method would be called when the proposal has been chosen.
-    // You would implement logic here that should occur once a proposal has been accepted by a quorum.
     private void onProposalChosen(String value) {
         // Log the success of the proposal
         logger.info("NODE " + serverNode.getNodeName() + ": " + "Proposal with number " + this.highestProposalNumberSeen + " and value " + value + " has been chosen.");
-
-        // Implement logic to be performed once the value has been chosen
-        // This could involve sending a message to learners or updating some state within the system
+        acceptedValue = value;
+        // Set the commit phase initiated flag
+        this.commitPhaseInitiated = true;
     }
 
     @Override
@@ -219,5 +219,13 @@ public class PaxosProposer extends PaxosParticipant {
             default:
                 logger.warning("NODE " + serverNode.getNodeName() + ": " + "Received unsupported message type: " + message.getType());
         }
+    }
+
+    public String getAcceptedValue() {
+        return acceptedValue;
+    }
+
+    public boolean isFinished() {
+        return commitPhaseInitiated;
     }
 }

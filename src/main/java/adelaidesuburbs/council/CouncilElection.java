@@ -7,6 +7,8 @@ import paxos.participants.PaxosAcceptor;
 
 import java.util.List;
 import java.util.ArrayList;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import java.util.logging.*;
 import java.util.stream.Collectors;
@@ -54,11 +56,11 @@ public class CouncilElection {
 
     private static final Logger logger = Logger.getLogger(CouncilElection.class.getName());
 
-    public CouncilElection(boolean useImmediateResponses) {
+    public CouncilElection(boolean useImmediateResponses, int proposerCount) {
         this.nodes = new ArrayList<>();
         this.members = new ArrayList<>();
         initialiseNodes();
-        initialiseMembers(useImmediateResponses);
+        initialiseMembers(useImmediateResponses, proposerCount);
     }
 
     private void initialiseNodes() {
@@ -68,7 +70,7 @@ public class CouncilElection {
         }
     }
 
-    private void initialiseMembers(boolean useImmediateResponses) {
+    private void initialiseMembers(boolean useImmediateResponses, int proposerCount) {
         logger.info("INITIALISING COUNCIL");
 
         // Profiles for demonstration
@@ -76,7 +78,7 @@ public class CouncilElection {
 
         // Create council members
         for (int memberId = 1; memberId <= 9; memberId++) {
-            boolean isProposer = determineIfMemberIsProposer(memberId);
+            boolean isProposer = determineIfMemberIsProposer(memberId, proposerCount);
             Node serverNode = new Node("M" + memberId, "localhost", acceptorPortBase + memberId, proposerPortBase + memberId);
 
             DelayProfile profile;
@@ -95,55 +97,116 @@ public class CouncilElection {
         printCouncilDetailsHelper();
     }
 
-    private boolean determineIfMemberIsProposer(int memberId) {
+    private boolean determineIfMemberIsProposer(int memberId, int proposerCount) {
         // Logic to determine the role of each member (e.g., M1, M2, M3 can be proposers)
-        // return memberId == 1; // For simplicity, only M1 is proposer
-        return memberId <= 3; // M1, M2, M3 are all proposers
+        return memberId <= proposerCount;
     }
 
     public void kickoffElection() {
         logger.info("STARTING ELECTION");
-        CouncilMember proposer = members.stream()
-                                        .filter(member -> member.isProposer())
-                                        .findFirst()
-                                        .orElseThrow(() -> new IllegalStateException("No proposer found."));
-        proposer.startProposal(proposer.selfNode.getNodeName());
+        List<CouncilMember> proposers = members.stream()
+                                           .filter(CouncilMember::isProposer)
+                                           .collect(Collectors.toList());
+                                        
+        
+        if (proposers.isEmpty()) {
+            throw new IllegalStateException("No proposer found.");
+        }
+    
+        ExecutorService executor = Executors.newFixedThreadPool(proposers.size());
+
+        for (CouncilMember proposer : proposers) {
+            executor.submit(() -> proposer.startProposal(proposer.selfNode.getNodeName()));
+        }
+    
+        executor.shutdown();
+
+        // Wait for all proposals to finish
+        for (int i = 0; i < 10; i++) {
+            try {
+                logger.info("Announcing result in " + (10 - i) + " seconds.");
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        }
     }
 
     public void announceResult() {
         logger.info("ANNOUNCING RESULT");
-        // Announce the result of the election
-        // The result is determined once a majority consensus is reached
+        
+        // Wait for all proposals to finish
+        while (true) {
+            boolean proposalFinished = false;
+            for (CouncilMember member : members) {
+                if (member.isProposer() && member.proposerRole.isFinished()) {
+                    proposalFinished = true;
+                    break;
+                }
+            }
+            if (proposalFinished) {
+                break;
+            }
+        }
+
+        cleanup();
+
+        StringBuilder resultBuilder = new StringBuilder();
+        resultBuilder.append("\nElection result:\n");
+        for (CouncilMember member : members) {
+            if (!member.isProposer()) {
+                continue;
+            }
+            String acceptedValue = member.proposerRole.getAcceptedValue();
+            if (acceptedValue != null) {
+                resultBuilder.append(String.format("    The council member %s was elected as president.\n", acceptedValue));
+            }
+        }
+        logger.info(resultBuilder.toString());
+    }
+
+    private void cleanup() {
+        // Stop all the servers
+        for (CouncilMember member : members) {
+            member.acceptorRole.stop();
+            if (member.proposerRole != null) {
+                member.proposerRole.stop();
+            }
+        }
+
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
     }
 
     private void printCouncilDetailsHelper() {
-    System.out.println();
-    System.out.println("Details about the council:");
-    for (CouncilMember member : members) {
-        System.out.println(String.format("    Name: M%s", member.memberId));
-        System.out.println(String.format("    Port: %s,%s", member.selfNode.getAcceptorPort(), member.selfNode.getProposerPort()));
-        System.out.println(String.format("    ConnectedTo: [%s]", member.getConnectedNodes().stream()
-            .map(node -> String.valueOf(node.getNodeName()))
-            .collect(Collectors.joining(", "))));
-        System.out.println(String.format("    DelayProfile: %s", member.profile));
-
-        // Constructing the roles string
-        List<String> roles = new ArrayList<>();
-        if (member.proposerRole != null) {
-            roles.add("Proposer");
-        }
-        if (member.acceptorRole != null) {
-            roles.add("Acceptor");
-        }
-        String rolesString = String.join(", ", roles);
-        System.out.println("    Role: " + rolesString);
-
-        System.out.println();
-    }
-}
-
-
+        StringBuilder councilDetails = new StringBuilder();
+        councilDetails.append("\nDetails about the council:\n");
+        for (CouncilMember member : members) {
+            councilDetails.append(String.format("    Name: M%s\n", member.memberId))
+                          .append(String.format("    Port: %s,%s\n", member.selfNode.getAcceptorPort(), member.selfNode.getProposerPort()))
+                          .append(String.format("    ConnectedTo: [%s]\n", member.getConnectedNodes().stream()
+                              .map(Node::getNodeName)
+                              .collect(Collectors.joining(", "))))
+                          .append(String.format("    DelayProfile: %s\n", member.profile));
     
+            List<String> roles = new ArrayList<>();
+            if (member.proposerRole != null) {
+                roles.add("Proposer");
+            }
+            if (member.acceptorRole != null) {
+                roles.add("Acceptor");
+            }
+            String rolesString = String.join(", ", roles);
+            councilDetails.append("    Role: ").append(rolesString).append("\n\n");
+        }
+        logger.info(councilDetails.toString());
+    }
+    
+
+
     public static class CouncilMember {
         private int memberId;
         private Node selfNode;

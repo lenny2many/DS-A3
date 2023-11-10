@@ -19,11 +19,9 @@ public class NetworkClient {
             out.println(message);
             // logger.info("Sent message: " + message);
         } catch (UnknownHostException e) {
-            logger.severe("Don't know about host " + host);
-            System.exit(1);
+            logger.warning("Don't know about host " + host);
         } catch (IOException e) {
-            logger.severe("Couldn't get I/O for the connection to " + host);
-            System.exit(1);
+            logger.warning("Couldn't get I/O for the connection to " + host);
         }
     }
 }

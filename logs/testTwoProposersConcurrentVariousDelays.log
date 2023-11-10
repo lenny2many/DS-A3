@@ -1,0 +1,366 @@
+Nov 10, 2023 9:36:08 PM adelaidesuburbs.council.CouncilElection initialiseMembers
+INFO: INITIALISING COUNCIL
+Nov 10, 2023 9:36:08 PM paxos.network.NetworkServer startServer
+INFO: Starting server on port 8001
+Nov 10, 2023 9:36:08 PM paxos.network.NetworkServer startServer
+INFO: Starting server on port 9001
+Nov 10, 2023 9:36:08 PM paxos.network.NetworkServer startServer
+INFO: Starting server on port 8002
+Nov 10, 2023 9:36:08 PM paxos.network.NetworkServer startServer
+INFO: Starting server on port 9002
+Nov 10, 2023 9:36:08 PM paxos.network.NetworkServer startServer
+INFO: Starting server on port 8003
+Nov 10, 2023 9:36:08 PM paxos.network.NetworkServer startServer
+INFO: Starting server on port 8004
+Nov 10, 2023 9:36:08 PM paxos.network.NetworkServer startServer
+INFO: Starting server on port 8005
+Nov 10, 2023 9:36:08 PM paxos.network.NetworkServer startServer
+INFO: Starting server on port 8006
+Nov 10, 2023 9:36:08 PM paxos.network.NetworkServer startServer
+INFO: Starting server on port 8007
+Nov 10, 2023 9:36:08 PM paxos.network.NetworkServer startServer
+INFO: Starting server on port 8008
+Nov 10, 2023 9:36:08 PM paxos.network.NetworkServer startServer
+INFO: Starting server on port 8009
+Nov 10, 2023 9:36:08 PM adelaidesuburbs.council.CouncilElection printCouncilDetailsHelper
+INFO: 
+Details about the council:
+    Name: M1
+    Port: 8001,9001
+    ConnectedTo: [M1, M2, M3, M4, M5, M6, M7, M8, M9]
+    DelayProfile: SMALL_DELAY
+    Role: Proposer, Acceptor
+
+    Name: M2
+    Port: 8002,9002
+    ConnectedTo: [M1, M2, M3, M4, M5, M6, M7, M8, M9]
+    DelayProfile: LARGE_DELAY
+    Role: Proposer, Acceptor
+
+    Name: M3
+    Port: 8003,9003
+    ConnectedTo: [M1, M2, M3, M4, M5, M6, M7, M8, M9]
+    DelayProfile: NO_RESPONSE
+    Role: Acceptor
+
+    Name: M4
+    Port: 8004,9004
+    ConnectedTo: [M1, M2, M3, M4, M5, M6, M7, M8, M9]
+    DelayProfile: IMMEDIATE_RESPONSE
+    Role: Acceptor
+
+    Name: M5
+    Port: 8005,9005
+    ConnectedTo: [M1, M2, M3, M4, M5, M6, M7, M8, M9]
+    DelayProfile: SMALL_DELAY
+    Role: Acceptor
+
+    Name: M6
+    Port: 8006,9006
+    ConnectedTo: [M1, M2, M3, M4, M5, M6, M7, M8, M9]
+    DelayProfile: LARGE_DELAY
+    Role: Acceptor
+
+    Name: M7
+    Port: 8007,9007
+    ConnectedTo: [M1, M2, M3, M4, M5, M6, M7, M8, M9]
+    DelayProfile: NO_RESPONSE
+    Role: Acceptor
+
+    Name: M8
+    Port: 8008,9008
+    ConnectedTo: [M1, M2, M3, M4, M5, M6, M7, M8, M9]
+    DelayProfile: IMMEDIATE_RESPONSE
+    Role: Acceptor
+
+    Name: M9
+    Port: 8009,9009
+    ConnectedTo: [M1, M2, M3, M4, M5, M6, M7, M8, M9]
+    DelayProfile: SMALL_DELAY
+    Role: Acceptor
+
+
+Nov 10, 2023 9:36:08 PM adelaidesuburbs.council.CouncilElection kickoffElection
+INFO: STARTING ELECTION
+Nov 10, 2023 9:36:08 PM adelaidesuburbs.council.CouncilElection kickoffElection
+INFO: Announcing result in 10 seconds.
+Nov 10, 2023 9:36:08 PM paxos.participants.PaxosProposer sendPrepareRequests
+INFO: NODE M1: Sending prepare request with proposal number 1 to acceptor M1
+Nov 10, 2023 9:36:08 PM paxos.participants.PaxosProposer sendPrepareRequests
+INFO: NODE M2: Sending prepare request with proposal number 1 to acceptor M1
+Nov 10, 2023 9:36:08 PM paxos.participants.PaxosParticipant simulateDelay
+INFO: NODE M2: Simulating large delay.
+Nov 10, 2023 9:36:08 PM paxos.participants.PaxosParticipant simulateDelay
+INFO: NODE M1: Simulating small delay.
+Nov 10, 2023 9:36:08 PM paxos.participants.PaxosProposer sendPrepareRequests
+INFO: NODE M1: Sending prepare request with proposal number 1 to acceptor M2
+Nov 10, 2023 9:36:08 PM paxos.participants.PaxosParticipant simulateDelay
+INFO: NODE M1: Simulating small delay.
+Nov 10, 2023 9:36:08 PM paxos.participants.PaxosAcceptor onPrepareRequest
+INFO: NODE M1: Received prepare request with proposal number: 1 from proposer M1
+Nov 10, 2023 9:36:08 PM paxos.participants.PaxosParticipant simulateDelay
+INFO: NODE M1: Simulating small delay.
+Nov 10, 2023 9:36:08 PM paxos.participants.PaxosProposer sendPrepareRequests
+INFO: NODE M1: Sending prepare request with proposal number 1 to acceptor M3
+Nov 10, 2023 9:36:08 PM paxos.participants.PaxosParticipant simulateDelay
+INFO: NODE M1: Simulating small delay.
+Nov 10, 2023 9:36:08 PM paxos.participants.PaxosAcceptor onPrepareRequest
+INFO: NODE M2: Received prepare request with proposal number: 1 from proposer M1
+Nov 10, 2023 9:36:08 PM paxos.participants.PaxosParticipant simulateDelay
+INFO: NODE M2: Simulating large delay.
+Nov 10, 2023 9:36:08 PM paxos.participants.PaxosAcceptor onPrepareRequest
+INFO: NODE M1: Sent promise with proposal number: 1 to proposer M1
+Nov 10, 2023 9:36:08 PM paxos.participants.PaxosProposer onPrepareResponse
+INFO: NODE M1: Received promise from acceptor M1 for proposal number 1
+Nov 10, 2023 9:36:08 PM paxos.participants.PaxosProposer sendPrepareRequests
+INFO: NODE M1: Sending prepare request with proposal number 1 to acceptor M4
+Nov 10, 2023 9:36:08 PM paxos.participants.PaxosParticipant simulateDelay
+INFO: NODE M1: Simulating small delay.
+Nov 10, 2023 9:36:08 PM paxos.participants.PaxosAcceptor onPrepareRequest
+INFO: NODE M3: Received prepare request with proposal number: 1 from proposer M1
+Nov 10, 2023 9:36:08 PM paxos.participants.PaxosParticipant simulateDelay
+INFO: NODE M3: Simulating no response.
+Nov 10, 2023 9:36:08 PM paxos.participants.PaxosProposer sendPrepareRequests
+INFO: NODE M1: Sending prepare request with proposal number 1 to acceptor M5
+Nov 10, 2023 9:36:08 PM paxos.participants.PaxosParticipant simulateDelay
+INFO: NODE M1: Simulating small delay.
+Nov 10, 2023 9:36:08 PM paxos.participants.PaxosAcceptor onPrepareRequest
+INFO: NODE M4: Received prepare request with proposal number: 1 from proposer M1
+Nov 10, 2023 9:36:08 PM paxos.participants.PaxosAcceptor onPrepareRequest
+INFO: NODE M4: Sent promise with proposal number: 1 to proposer M1
+Nov 10, 2023 9:36:08 PM paxos.participants.PaxosProposer onPrepareResponse
+INFO: NODE M1: Received promise from acceptor M4 for proposal number 1
+Nov 10, 2023 9:36:08 PM paxos.participants.PaxosProposer sendPrepareRequests
+INFO: NODE M1: Sending prepare request with proposal number 1 to acceptor M6
+Nov 10, 2023 9:36:08 PM paxos.participants.PaxosAcceptor onPrepareRequest
+INFO: NODE M5: Received prepare request with proposal number: 1 from proposer M1
+Nov 10, 2023 9:36:08 PM paxos.participants.PaxosParticipant simulateDelay
+INFO: NODE M1: Simulating small delay.
+Nov 10, 2023 9:36:08 PM paxos.participants.PaxosParticipant simulateDelay
+INFO: NODE M5: Simulating small delay.
+Nov 10, 2023 9:36:08 PM paxos.participants.PaxosProposer sendPrepareRequests
+INFO: NODE M1: Sending prepare request with proposal number 1 to acceptor M7
+Nov 10, 2023 9:36:08 PM paxos.participants.PaxosParticipant simulateDelay
+INFO: NODE M1: Simulating small delay.
+Nov 10, 2023 9:36:08 PM paxos.participants.PaxosProposer onPrepareResponse
+INFO: NODE M1: Received promise from acceptor M5 for proposal number 1
+Nov 10, 2023 9:36:08 PM paxos.participants.PaxosAcceptor onPrepareRequest
+INFO: NODE M5: Sent promise with proposal number: 1 to proposer M1
+Nov 10, 2023 9:36:08 PM paxos.participants.PaxosAcceptor onPrepareRequest
+INFO: NODE M6: Received prepare request with proposal number: 1 from proposer M1
+Nov 10, 2023 9:36:08 PM paxos.participants.PaxosParticipant simulateDelay
+INFO: NODE M6: Simulating large delay.
+Nov 10, 2023 9:36:08 PM paxos.participants.PaxosProposer sendPrepareRequests
+INFO: NODE M1: Sending prepare request with proposal number 1 to acceptor M8
+Nov 10, 2023 9:36:08 PM paxos.participants.PaxosParticipant simulateDelay
+INFO: NODE M1: Simulating small delay.
+Nov 10, 2023 9:36:08 PM paxos.participants.PaxosAcceptor onPrepareRequest
+INFO: NODE M7: Received prepare request with proposal number: 1 from proposer M1
+Nov 10, 2023 9:36:08 PM paxos.participants.PaxosParticipant simulateDelay
+INFO: NODE M7: Simulating no response.
+Nov 10, 2023 9:36:08 PM paxos.participants.PaxosProposer sendPrepareRequests
+INFO: NODE M1: Sending prepare request with proposal number 1 to acceptor M9
+Nov 10, 2023 9:36:08 PM paxos.participants.PaxosParticipant simulateDelay
+INFO: NODE M1: Simulating small delay.
+Nov 10, 2023 9:36:08 PM paxos.participants.PaxosAcceptor onPrepareRequest
+INFO: NODE M8: Received prepare request with proposal number: 1 from proposer M1
+Nov 10, 2023 9:36:08 PM paxos.participants.PaxosAcceptor onPrepareRequest
+INFO: NODE M8: Sent promise with proposal number: 1 to proposer M1
+Nov 10, 2023 9:36:08 PM paxos.participants.PaxosProposer onPrepareResponse
+INFO: NODE M1: Received promise from acceptor M8 for proposal number 1
+Nov 10, 2023 9:36:09 PM paxos.participants.PaxosAcceptor onPrepareRequest
+INFO: NODE M9: Received prepare request with proposal number: 1 from proposer M1
+Nov 10, 2023 9:36:09 PM paxos.participants.PaxosParticipant simulateDelay
+INFO: NODE M9: Simulating small delay.
+Nov 10, 2023 9:36:09 PM adelaidesuburbs.council.CouncilElection kickoffElection
+INFO: Announcing result in 9 seconds.
+Nov 10, 2023 9:36:09 PM paxos.participants.PaxosProposer sendPrepareRequests
+INFO: NODE M2: Sending prepare request with proposal number 1 to acceptor M2
+Nov 10, 2023 9:36:09 PM paxos.participants.PaxosParticipant simulateDelay
+INFO: NODE M2: Simulating large delay.
+Nov 10, 2023 9:36:09 PM paxos.participants.PaxosAcceptor onPrepareRequest
+INFO: NODE M1: Received prepare request with proposal number: 1 from proposer M2
+Nov 10, 2023 9:36:09 PM paxos.participants.PaxosAcceptor onPrepareRequest
+INFO: NODE M9: Sent promise with proposal number: 1 to proposer M1
+Nov 10, 2023 9:36:09 PM paxos.participants.PaxosProposer onPrepareResponse
+INFO: NODE M1: Received promise from acceptor M9 for proposal number 1
+Nov 10, 2023 9:36:09 PM paxos.participants.PaxosProposer onPrepareResponse
+INFO: NODE M1: Received a quorum of promises for proposal number 1. Entering accept phase.
+Nov 10, 2023 9:36:09 PM paxos.participants.PaxosProposer sendAcceptRequests
+INFO: NODE M1: Sending accept requests to all acceptors for proposal number 1 with value: M1
+Nov 10, 2023 9:36:09 PM paxos.participants.PaxosParticipant simulateDelay
+INFO: NODE M1: Simulating small delay.
+Nov 10, 2023 9:36:09 PM paxos.participants.PaxosParticipant simulateDelay
+INFO: NODE M1: Simulating small delay.
+Nov 10, 2023 9:36:09 PM paxos.participants.PaxosAcceptor onAcceptRequest
+INFO: NODE M1: Received accept request with proposal number: 1 and value: M1 from proposer M1
+Nov 10, 2023 9:36:09 PM paxos.participants.PaxosParticipant simulateDelay
+INFO: NODE M1: Simulating small delay.
+Nov 10, 2023 9:36:09 PM paxos.participants.PaxosAcceptor onPrepareRequest
+INFO: NODE M2: Sent promise with proposal number: 1 to proposer M1
+Nov 10, 2023 9:36:09 PM paxos.participants.PaxosParticipant simulateDelay
+INFO: NODE M1: Simulating small delay.
+Nov 10, 2023 9:36:09 PM paxos.participants.PaxosAcceptor onAcceptRequest
+INFO: NODE M2: Received accept request with proposal number: 1 and value: M1 from proposer M1
+Nov 10, 2023 9:36:09 PM paxos.participants.PaxosAcceptor onAcceptRequest
+INFO: NODE M1: Sent accepted message with proposal number: 1 and value: M1 to proposer M1
+Nov 10, 2023 9:36:09 PM paxos.participants.PaxosParticipant simulateDelay
+INFO: NODE M2: Simulating large delay.
+Nov 10, 2023 9:36:09 PM paxos.participants.PaxosParticipant simulateDelay
+INFO: NODE M1: Simulating small delay.
+Nov 10, 2023 9:36:09 PM paxos.participants.PaxosParticipant simulateDelay
+INFO: NODE M1: Simulating small delay.
+Nov 10, 2023 9:36:09 PM paxos.participants.PaxosAcceptor onAcceptRequest
+INFO: NODE M4: Received accept request with proposal number: 1 and value: M1 from proposer M1
+Nov 10, 2023 9:36:09 PM paxos.participants.PaxosAcceptor onAcceptRequest
+INFO: NODE M4: Sent accepted message with proposal number: 1 and value: M1 to proposer M1
+Nov 10, 2023 9:36:09 PM paxos.participants.PaxosParticipant simulateDelay
+INFO: NODE M1: Simulating small delay.
+Nov 10, 2023 9:36:09 PM paxos.participants.PaxosAcceptor onAcceptRequest
+INFO: NODE M5: Received accept request with proposal number: 1 and value: M1 from proposer M1
+Nov 10, 2023 9:36:09 PM paxos.participants.PaxosParticipant simulateDelay
+INFO: NODE M5: Simulating small delay.
+Nov 10, 2023 9:36:09 PM paxos.participants.PaxosAcceptor onPrepareRequest
+INFO: NODE M6: Sent promise with proposal number: 1 to proposer M1
+Nov 10, 2023 9:36:09 PM paxos.participants.PaxosParticipant simulateDelay
+INFO: NODE M1: Simulating small delay.
+Nov 10, 2023 9:36:09 PM paxos.participants.PaxosAcceptor onAcceptRequest
+INFO: NODE M6: Received accept request with proposal number: 1 and value: M1 from proposer M1
+Nov 10, 2023 9:36:09 PM paxos.participants.PaxosAcceptor onAcceptRequest
+INFO: NODE M5: Sent accepted message with proposal number: 1 and value: M1 to proposer M1
+Nov 10, 2023 9:36:09 PM paxos.participants.PaxosParticipant simulateDelay
+INFO: NODE M6: Simulating large delay.
+Nov 10, 2023 9:36:09 PM paxos.participants.PaxosParticipant simulateDelay
+INFO: NODE M1: Simulating small delay.
+Nov 10, 2023 9:36:09 PM paxos.participants.PaxosParticipant simulateDelay
+INFO: NODE M1: Simulating small delay.
+Nov 10, 2023 9:36:09 PM paxos.participants.PaxosAcceptor onAcceptRequest
+INFO: NODE M8: Received accept request with proposal number: 1 and value: M1 from proposer M1
+Nov 10, 2023 9:36:09 PM paxos.participants.PaxosAcceptor onAcceptRequest
+INFO: NODE M8: Sent accepted message with proposal number: 1 and value: M1 to proposer M1
+Nov 10, 2023 9:36:10 PM paxos.participants.PaxosProposer onPrepareResponse
+INFO: NODE M1: Received outdated promise from acceptor M2 for proposal number 1
+Nov 10, 2023 9:36:10 PM paxos.participants.PaxosAcceptor onAcceptRequest
+INFO: NODE M9: Received accept request with proposal number: 1 and value: M1 from proposer M1
+Nov 10, 2023 9:36:10 PM paxos.participants.PaxosProposer onAcceptResponse
+INFO: NODE M1: Received acceptance from acceptor M1 for proposal number 1
+Nov 10, 2023 9:36:10 PM paxos.participants.PaxosParticipant simulateDelay
+INFO: NODE M9: Simulating small delay.
+Nov 10, 2023 9:36:10 PM paxos.participants.PaxosProposer onAcceptResponse
+INFO: NODE M1: Received acceptance from acceptor M1 for proposal number 1
+Nov 10, 2023 9:36:10 PM paxos.participants.PaxosProposer onPrepareResponse
+INFO: NODE M1: Received outdated promise from acceptor M6 for proposal number 1
+Nov 10, 2023 9:36:10 PM paxos.participants.PaxosProposer onAcceptResponse
+INFO: NODE M1: Received acceptance from acceptor M1 for proposal number 1
+Nov 10, 2023 9:36:10 PM paxos.participants.PaxosProposer onAcceptResponse
+INFO: NODE M1: Received acceptance from acceptor M1 for proposal number 1
+Nov 10, 2023 9:36:10 PM adelaidesuburbs.council.CouncilElection kickoffElection
+INFO: Announcing result in 8 seconds.
+Nov 10, 2023 9:36:10 PM paxos.participants.PaxosProposer sendPrepareRequests
+INFO: NODE M2: Sending prepare request with proposal number 1 to acceptor M3
+Nov 10, 2023 9:36:10 PM paxos.participants.PaxosParticipant simulateDelay
+INFO: NODE M2: Simulating large delay.
+Nov 10, 2023 9:36:10 PM paxos.participants.PaxosAcceptor onAcceptRequest
+INFO: NODE M9: Sent accepted message with proposal number: 1 and value: M1 to proposer M1
+Nov 10, 2023 9:36:10 PM paxos.participants.PaxosProposer onAcceptResponse
+INFO: NODE M1: Received acceptance from acceptor M1 for proposal number 1
+Nov 10, 2023 9:36:10 PM paxos.participants.PaxosAcceptor onAcceptRequest
+INFO: NODE M2: Sent accepted message with proposal number: 1 and value: M1 to proposer M1
+Nov 10, 2023 9:36:10 PM paxos.participants.PaxosProposer onAcceptResponse
+INFO: NODE M1: Received acceptance from acceptor M1 for proposal number 1
+Nov 10, 2023 9:36:10 PM paxos.participants.PaxosAcceptor onPrepareRequest
+INFO: NODE M2: Received prepare request with proposal number: 1 from proposer M2
+Nov 10, 2023 9:36:10 PM paxos.participants.PaxosProposer onAcceptResponse
+INFO: NODE M1: Received a quorum of acceptances for proposal number 1. Proposal chosen.
+Nov 10, 2023 9:36:10 PM paxos.participants.PaxosProposer onProposalChosen
+INFO: NODE M1: Proposal with number 1 and value M1 has been chosen.
+Nov 10, 2023 9:36:10 PM paxos.participants.PaxosAcceptor onAcceptRequest
+INFO: NODE M6: Sent accepted message with proposal number: 1 and value: M1 to proposer M1
+Nov 10, 2023 9:36:10 PM paxos.participants.PaxosProposer onAcceptResponse
+INFO: NODE M1: Received outdated acceptance from acceptor M1 for proposal number 1
+Nov 10, 2023 9:36:11 PM adelaidesuburbs.council.CouncilElection kickoffElection
+INFO: Announcing result in 7 seconds.
+Nov 10, 2023 9:36:11 PM paxos.participants.PaxosProposer sendPrepareRequests
+INFO: NODE M2: Sending prepare request with proposal number 1 to acceptor M4
+Nov 10, 2023 9:36:11 PM paxos.participants.PaxosParticipant simulateDelay
+INFO: NODE M2: Simulating large delay.
+Nov 10, 2023 9:36:12 PM adelaidesuburbs.council.CouncilElection kickoffElection
+INFO: Announcing result in 6 seconds.
+Nov 10, 2023 9:36:12 PM paxos.participants.PaxosProposer sendPrepareRequests
+INFO: NODE M2: Sending prepare request with proposal number 1 to acceptor M5
+Nov 10, 2023 9:36:12 PM paxos.participants.PaxosParticipant simulateDelay
+INFO: NODE M2: Simulating large delay.
+Nov 10, 2023 9:36:12 PM paxos.participants.PaxosAcceptor onPrepareRequest
+INFO: NODE M4: Received prepare request with proposal number: 1 from proposer M2
+Nov 10, 2023 9:36:13 PM adelaidesuburbs.council.CouncilElection kickoffElection
+INFO: Announcing result in 5 seconds.
+Nov 10, 2023 9:36:13 PM paxos.participants.PaxosProposer sendPrepareRequests
+INFO: NODE M2: Sending prepare request with proposal number 1 to acceptor M6
+Nov 10, 2023 9:36:13 PM paxos.participants.PaxosAcceptor onPrepareRequest
+INFO: NODE M5: Received prepare request with proposal number: 1 from proposer M2
+Nov 10, 2023 9:36:13 PM paxos.participants.PaxosParticipant simulateDelay
+INFO: NODE M2: Simulating large delay.
+Nov 10, 2023 9:36:14 PM adelaidesuburbs.council.CouncilElection kickoffElection
+INFO: Announcing result in 4 seconds.
+Nov 10, 2023 9:36:14 PM paxos.participants.PaxosProposer sendPrepareRequests
+INFO: NODE M2: Sending prepare request with proposal number 1 to acceptor M7
+Nov 10, 2023 9:36:14 PM paxos.participants.PaxosParticipant simulateDelay
+INFO: NODE M2: Simulating large delay.
+Nov 10, 2023 9:36:14 PM paxos.participants.PaxosAcceptor onPrepareRequest
+INFO: NODE M6: Received prepare request with proposal number: 1 from proposer M2
+Nov 10, 2023 9:36:15 PM adelaidesuburbs.council.CouncilElection kickoffElection
+INFO: Announcing result in 3 seconds.
+Nov 10, 2023 9:36:15 PM paxos.participants.PaxosProposer sendPrepareRequests
+INFO: NODE M2: Sending prepare request with proposal number 1 to acceptor M8
+Nov 10, 2023 9:36:15 PM paxos.participants.PaxosParticipant simulateDelay
+INFO: NODE M2: Simulating large delay.
+Nov 10, 2023 9:36:16 PM adelaidesuburbs.council.CouncilElection kickoffElection
+INFO: Announcing result in 2 seconds.
+Nov 10, 2023 9:36:16 PM paxos.participants.PaxosProposer sendPrepareRequests
+INFO: NODE M2: Sending prepare request with proposal number 1 to acceptor M9
+Nov 10, 2023 9:36:16 PM paxos.participants.PaxosParticipant simulateDelay
+INFO: NODE M2: Simulating large delay.
+Nov 10, 2023 9:36:16 PM paxos.participants.PaxosAcceptor onPrepareRequest
+INFO: NODE M8: Received prepare request with proposal number: 1 from proposer M2
+Nov 10, 2023 9:36:17 PM adelaidesuburbs.council.CouncilElection kickoffElection
+INFO: Announcing result in 1 seconds.
+Nov 10, 2023 9:36:17 PM paxos.participants.PaxosAcceptor onPrepareRequest
+INFO: NODE M9: Received prepare request with proposal number: 1 from proposer M2
+Nov 10, 2023 9:36:18 PM adelaidesuburbs.council.CouncilElection announceResult
+INFO: ANNOUNCING RESULT
+Nov 10, 2023 9:36:18 PM paxos.network.NetworkServer run
+INFO: Server stopped
+Nov 10, 2023 9:36:18 PM paxos.network.NetworkServer run
+INFO: Server stopped
+Nov 10, 2023 9:36:18 PM paxos.network.NetworkServer run
+INFO: Server stopped
+Nov 10, 2023 9:36:18 PM paxos.network.NetworkServer run
+INFO: Server stopped
+Nov 10, 2023 9:36:18 PM paxos.network.NetworkClient sendMessage
+WARNING: Couldn't get I/O for the connection to localhost
+Nov 10, 2023 9:36:18 PM paxos.participants.PaxosAcceptor onPrepareRequest
+INFO: NODE M3: Sent promise with proposal number: 1 to proposer M1
+Nov 10, 2023 9:36:18 PM paxos.network.NetworkServer run
+INFO: Server stopped
+Nov 10, 2023 9:36:18 PM paxos.network.NetworkServer run
+INFO: Server stopped
+Nov 10, 2023 9:36:18 PM paxos.network.NetworkServer run
+INFO: Server stopped
+Nov 10, 2023 9:36:18 PM paxos.network.NetworkServer run
+INFO: Server stopped
+Nov 10, 2023 9:36:18 PM paxos.network.NetworkClient sendMessage
+WARNING: Couldn't get I/O for the connection to localhost
+Nov 10, 2023 9:36:18 PM paxos.participants.PaxosAcceptor onPrepareRequest
+INFO: NODE M7: Sent promise with proposal number: 1 to proposer M1
+Nov 10, 2023 9:36:18 PM paxos.network.NetworkServer run
+INFO: Server stopped
+Nov 10, 2023 9:36:18 PM paxos.network.NetworkServer run
+INFO: Server stopped
+Nov 10, 2023 9:36:18 PM paxos.network.NetworkServer run
+INFO: Server stopped
+Nov 10, 2023 9:36:19 PM adelaidesuburbs.council.CouncilElection announceResult
+INFO: 
+Election result:
+    The council member M1 was elected as president.
+    The council member  was elected as president.
+
