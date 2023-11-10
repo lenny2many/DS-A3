@@ -6,7 +6,8 @@ public class App {
 
     
     public static void main(String[] args) {
-        CouncilElection council = new CouncilElection();
+        boolean useImmediateResponses = true;
+        CouncilElection council = new CouncilElection(useImmediateResponses);
         council.kickoffElection();
         // council.announceResult();
     }

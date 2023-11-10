@@ -1,5 +1,6 @@
 package adelaidesuburbs.council;
 
+import paxos.participants.PaxosParticipant.DelayProfile;
 import paxos.participants.PaxosParticipant.Node;
 import paxos.participants.PaxosProposer;
 import paxos.participants.PaxosAcceptor;
@@ -53,11 +54,11 @@ public class CouncilElection {
 
     private static final Logger logger = Logger.getLogger(CouncilElection.class.getName());
 
-    public CouncilElection() {
+    public CouncilElection(boolean useImmediateResponses) {
         this.nodes = new ArrayList<>();
         this.members = new ArrayList<>();
         initialiseNodes();
-        initialiseMembers();
+        initialiseMembers(useImmediateResponses);
     }
 
     private void initialiseNodes() {
@@ -67,16 +68,27 @@ public class CouncilElection {
         }
     }
 
-    private void initialiseMembers() {
+    private void initialiseMembers(boolean useImmediateResponses) {
         logger.info("INITIALISING COUNCIL");
+
+        // Profiles for demonstration
+        DelayProfile[] profiles = DelayProfile.values();
 
         // Create council members
         for (int memberId = 1; memberId <= 9; memberId++) {
             boolean isProposer = determineIfMemberIsProposer(memberId);
             Node serverNode = new Node("M" + memberId, "localhost", acceptorPortBase + memberId, proposerPortBase + memberId);
-            CouncilMember member = isProposer 
-                ? new CouncilMember(memberId, serverNode, nodes, isProposer)
-                : new CouncilMember(memberId, serverNode, nodes);
+
+            DelayProfile profile;
+            if (useImmediateResponses) {
+                // Set all profiles to IMMEDIATE_RESPONSE
+                profile = DelayProfile.IMMEDIATE_RESPONSE;
+            } else {
+                // Assign random profiles to members
+                profile = profiles[memberId % profiles.length]; // Assign profiles in a round-robin fashion
+            }
+
+            CouncilMember member = new CouncilMember(memberId, serverNode, nodes, isProposer, profile);
             members.add(member);
             member.startParticipant();  // Start the Paxos roles for the member
         }
@@ -85,7 +97,8 @@ public class CouncilElection {
 
     private boolean determineIfMemberIsProposer(int memberId) {
         // Logic to determine the role of each member (e.g., M1, M2, M3 can be proposers)
-        return memberId == 1; // For simplicity, only M1 is proposer
+        // return memberId == 1; // For simplicity, only M1 is proposer
+        return memberId <= 3; // M1, M2, M3 are all proposers
     }
 
     public void kickoffElection() {
@@ -94,7 +107,7 @@ public class CouncilElection {
                                         .filter(member -> member.isProposer())
                                         .findFirst()
                                         .orElseThrow(() -> new IllegalStateException("No proposer found."));
-        proposer.startProposal("M1");
+        proposer.startProposal(proposer.selfNode.getNodeName());
     }
 
     public void announceResult() {
@@ -112,6 +125,7 @@ public class CouncilElection {
         System.out.println(String.format("    ConnectedTo: [%s]", member.getConnectedNodes().stream()
             .map(node -> String.valueOf(node.getNodeName()))
             .collect(Collectors.joining(", "))));
+        System.out.println(String.format("    DelayProfile: %s", member.profile));
 
         // Constructing the roles string
         List<String> roles = new ArrayList<>();
@@ -136,22 +150,19 @@ public class CouncilElection {
         private PaxosAcceptor acceptorRole;
         private PaxosProposer proposerRole;
         private List<Node> connectedNodes;
+        private DelayProfile profile;
     
-        // Constructor for an acceptor only
-        public CouncilMember(int memberId, Node selfNode, List<Node> connectedNodes) {
+        public CouncilMember(int memberId, Node selfNode, List<Node> connectedNodes, boolean isProposer, DelayProfile profile) {
             this.memberId = memberId;
             this.selfNode = selfNode;
-            this.connectedNodes = new ArrayList<>(connectedNodes); // create a copy of the list
-            this.acceptorRole = new PaxosAcceptor(selfNode, connectedNodes);
-        }
-    
-        // Constructor for both an acceptor and a proposer
-        public CouncilMember(int memberId, Node selfNode, List<Node> connectedNodes, boolean isProposer) {
-            this.memberId = memberId;
-            this.selfNode = selfNode;
-            this.connectedNodes = new ArrayList<>(connectedNodes); // create a copy of the list
-            this.acceptorRole = new PaxosAcceptor(selfNode, connectedNodes);
-            this.proposerRole = new PaxosProposer(selfNode, connectedNodes);
+            this.profile = profile;
+            this.connectedNodes = new ArrayList<>(connectedNodes);
+
+            // Initialise the Paxos roles for the member
+            this.acceptorRole = new PaxosAcceptor(selfNode, connectedNodes, profile);
+            if (isProposer) {
+                this.proposerRole = new PaxosProposer(selfNode, connectedNodes, profile);
+            }
         }
 
         public void startProposal(String proposedValue) {
@@ -193,4 +204,6 @@ public class CouncilElection {
             return connectedNodes;
         }
     }
+
+       
 }

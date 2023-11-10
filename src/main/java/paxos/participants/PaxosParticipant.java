@@ -1,6 +1,5 @@
 package paxos.participants;
 
-import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -19,6 +18,7 @@ import paxos.network.MessageQueue.ClientMessage;
 public abstract class PaxosParticipant {
     protected NetworkServer server;
     protected Node serverNode;
+    protected DelayProfile delayProfile;
     protected List<Node> nodes = new ArrayList<>();
     protected MessageQueue messageQueue;
     private Thread messageProcessingThread;
@@ -31,8 +31,10 @@ public abstract class PaxosParticipant {
      * @param clientPort The port for sending messages.
      * @param nodes The list of nodes that this participant is connected to.
      */
-    public PaxosParticipant(Node serverNode, List<Node> nodes) {
-        
+    public PaxosParticipant(Node serverNode, List<Node> nodes) {}
+
+    public PaxosParticipant(Node serverNode, List<Node> nodes, DelayProfile delayProfile) {
+        this.delayProfile = delayProfile;
     }
 
     /**
@@ -99,9 +101,42 @@ public abstract class PaxosParticipant {
      * @param message The PaxosMessage to be sent.
      */
     public void sendMessage(PaxosMessage message, String host, int port) {
-        // logger.info("Sending message: " + message.toString() + " to " + host + ":" + port);
-
+        // Simulate delay
+        this.simulateDelay();
         NetworkClient.sendMessage(message.toString(), host, port);
+    }
+
+    public void simulateDelay() {
+        switch (this.delayProfile) {
+            case SMALL_DELAY:
+                try {
+                    logger.info("NODE " + serverNode.getNodeName() + ": " + "Simulating small delay.");
+                    Thread.sleep(100); // 100 ms
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
+                break;
+            case LARGE_DELAY:
+                try {
+                    logger.info("NODE " + serverNode.getNodeName() + ": " + "Simulating large delay.");
+                    Thread.sleep(1000); // 1 s
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
+                break;
+            case NO_RESPONSE:
+                try {
+                    logger.info("NODE " + serverNode.getNodeName() + ": " + "Simulating no response.");
+                    Thread.sleep(100000000); // 100000000 ms
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
+                break;
+            case IMMEDIATE_RESPONSE:
+            default:
+                // No delay
+                break;
+        }
     }
 
     public void setConnectedNodes(List<Node> nodes) {
@@ -152,4 +187,11 @@ public abstract class PaxosParticipant {
             return nodeName;
         }
     }
+
+    public enum DelayProfile {
+        IMMEDIATE_RESPONSE,
+        SMALL_DELAY,
+        LARGE_DELAY,
+        NO_RESPONSE
+    } 
 }

@@ -39,6 +39,18 @@ public class PaxosAcceptor extends PaxosParticipant {
         this.nodes = nodes;
     }
 
+    public PaxosAcceptor(Node serverNode, List<Node> nodes, DelayProfile delayProfile) {
+        super(serverNode, nodes, delayProfile);
+        // Server for receiving messages
+        this.serverNode = serverNode;
+        // Message queue for receiving messages
+        this.messageQueue = new MessageQueue();
+        // Server for receiving messages
+        this.server = new NetworkServer(serverNode.getAcceptorPort(), this.messageQueue);
+        // Retain list of nodes that this participant is connected to
+        this.nodes = nodes;
+    }
+
     /**
      * Constructor for PaxosAcceptor. Mainly used for testing.
      * @param serverPort The port for receiving messages.
@@ -70,9 +82,9 @@ public class PaxosAcceptor extends PaxosParticipant {
             highestPrepareNumber = prepareMessage.getProposalNumber();
 
             // Send a promise to not accept any lower-numbered proposals
-            logger.info("NODE " + serverNode.getNodeName() + ": " + "Sending promise with proposal number: " + prepareMessage.getProposalNumber() + " to proposer " + participantID);
             PaxosMessage promise = PaxosMessage.promiseMessage(prepareMessage.getProposalNumber(), acceptedValue, acceptedProposalNumber, this.getServerNodeID());
             sendMessage(promise, sender.getHost(), sender.getProposerPort());
+            logger.info("NODE " + serverNode.getNodeName() + ": " + "Sent promise with proposal number: " + prepareMessage.getProposalNumber() + " to proposer " + participantID);
         }
     }
     
@@ -91,10 +103,11 @@ public class PaxosAcceptor extends PaxosParticipant {
             acceptedValue = acceptMessage.getValue();
             
             // Send an accepted message to indicate the proposal has been accepted
-            logger.info("NODE " + serverNode.getNodeName() + ": " + "Sending accepted message with proposal number: " + acceptMessage.getProposalNumber() + " and value: " + acceptMessage.getValue() + " to proposer " + participantID);
             PaxosMessage accepted = PaxosMessage.acceptedMessage(acceptMessage.getProposalNumber(), acceptMessage.getValue(), participantID);
             // Broadcast the accepted message to all learners (or to the proposer, who will then inform the learners)
             sendMessage(accepted, sender.getHost(), sender.getProposerPort());
+            logger.info("NODE " + serverNode.getNodeName() + ": " + "Sent accepted message with proposal number: " + acceptMessage.getProposalNumber() + " and value: " + acceptMessage.getValue() + " to proposer " + participantID);
+
             // This is simplified; in an actual implementation, you might send it to a specific set of nodes.
             // for (Node node : this.nodes) {
             //     sendMessage(accepted, sender.getHost(), sender.getAcceptorPort());

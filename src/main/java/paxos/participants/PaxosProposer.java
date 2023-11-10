@@ -47,6 +47,18 @@ public class PaxosProposer extends PaxosParticipant {
         this.nodes = nodes;
     }
 
+    public PaxosProposer(Node serverNode, List<Node> nodes, DelayProfile delayProfile) {
+        super(serverNode, nodes, delayProfile);
+        // Server for receiving messages
+        this.serverNode = serverNode;
+        // Message queue for receiving messages
+        this.messageQueue = new MessageQueue();
+        // Server for receiving messages
+        this.server = new NetworkServer(serverNode.getProposerPort(), this.messageQueue);
+        // Retain list of nodes that this participant is connected to
+        this.nodes = nodes;
+    }
+
     public void startProposal(String proposedValue) {
         // Reset the number of promises received
         this.promisesReceived = 0;
