@@ -3,6 +3,9 @@ package paxos.network;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.logging.*;
+
+import paxos.network.MessageQueue.ClientMessage;
 
 /**
  * The NetworkServer class is responsible for accepting TCP connections from clients on a specified port.
@@ -14,6 +17,8 @@ public class NetworkServer implements Runnable {
     private MessageQueue messageQueue = null;
     private boolean isStopped = false;
     private Thread runningThread = null;
+
+    private static final Logger logger = Logger.getLogger(NetworkServer.class.getName());
 
     public NetworkServer(int port, MessageQueue messageQueue) {
         this.serverPort = port;
@@ -43,7 +48,7 @@ public class NetworkServer implements Runnable {
             }
             new Thread(new ClientHandler(clientSocket, this.messageQueue)).start();
         }
-        System.out.println("Server Stopped.");
+        logger.info("Server stopped");
     }
 
     /**
@@ -54,8 +59,10 @@ public class NetworkServer implements Runnable {
      */
     public synchronized void startServer() {
         if (this.runningThread != null) {
+            logger.warning("Server is already running, thread is: " + this.runningThread.getName() + "");
             throw new IllegalStateException("Server is already running");
         }
+        logger.info("Starting server on port " + this.serverPort + "");
         this.runningThread = new Thread(this);
         this.runningThread.start();
     }
@@ -116,8 +123,9 @@ public class NetworkServer implements Runnable {
                 String inputLine;
                 while ((inputLine = in.readLine()) != null) {
                     try {
+                        ClientMessage clientMessage = new ClientMessage(inputLine, clientSocket);
                         // Add message to message queue
-                        messageQueue.produceMessage(inputLine);
+                        messageQueue.produceMessage(clientMessage);
                     } catch (InterruptedException e) {
                         // Thread was interrupted during wait
                         Thread.currentThread().interrupt();

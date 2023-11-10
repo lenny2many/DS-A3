@@ -27,8 +27,16 @@ public class PaxosAcceptor extends PaxosParticipant {
      * @param clientPort The port for sending messages.
      * @param nodes The list of nodes that this acceptor is connected to.
      */
-    public PaxosAcceptor(int serverPort, int clientPort, List<Node> nodes) {
-        super(serverPort, clientPort, nodes);
+    public PaxosAcceptor(Node serverNode, List<Node> nodes) {
+        super(serverNode, nodes);
+        // Server for receiving messages
+        this.serverNode = serverNode;
+        // Message queue for receiving messages
+        this.messageQueue = new MessageQueue();
+        // Server for receiving messages
+        this.server = new NetworkServer(serverNode.getAcceptorPort(), this.messageQueue);
+        // Retain list of nodes that this participant is connected to
+        this.nodes = nodes;
     }
 
     /**
@@ -38,8 +46,15 @@ public class PaxosAcceptor extends PaxosParticipant {
      * @param nodes The list of nodes that this acceptor is connected to.
      * @param server The server for receiving messages.
      */
-    public PaxosAcceptor(int serverPort, int clientPort, List<Node> nodes, NetworkServer server, MessageQueue messageQueue) {
-        super(serverPort, clientPort, nodes, server, messageQueue);
+    public PaxosAcceptor(int serverPort, List<Node> nodes, NetworkServer server, MessageQueue messageQueue) {
+        super(serverPort, nodes, server, messageQueue);
+    }
+
+    public void start() {
+        // Start message processing thread
+        this.server.startServer();
+        // Start server thread
+        this.startMessageProcessingThread();
     }
     
     /**
@@ -48,14 +63,16 @@ public class PaxosAcceptor extends PaxosParticipant {
      *
      * @param prepareMessage The prepare message received from a proposer.
      */
-    public void onPrepareRequest(PaxosMessage prepareMessage) {
-        logger.info("Received prepare request with proposal number: " + prepareMessage.getProposalNumber());
+    public void onPrepareRequest(PaxosMessage prepareMessage, String participantID) {
+        Node sender = this.findNodeByID(participantID);
+        logger.info("NODE " + serverNode.getNodeName() + ": " + "Received prepare request with proposal number: " + prepareMessage.getProposalNumber() + " from proposer " + participantID);
         if (prepareMessage.getProposalNumber() > highestPrepareNumber) {
             highestPrepareNumber = prepareMessage.getProposalNumber();
 
             // Send a promise to not accept any lower-numbered proposals
-            PaxosMessage promise = new PaxosMessage(PaxosMessage.MessageType.PROMISE, prepareMessage.getProposalNumber(), this.acceptedProposalNumber, this.acceptedValue);
-            sendMessage(promise, new Node(prepareMessage.getSenderHost(), prepareMessage.getSenderPort()));
+            logger.info("NODE " + serverNode.getNodeName() + ": " + "Sending promise with proposal number: " + prepareMessage.getProposalNumber() + " to proposer " + participantID);
+            PaxosMessage promise = PaxosMessage.promiseMessage(prepareMessage.getProposalNumber(), acceptedValue, acceptedProposalNumber, this.getServerNodeID());
+            sendMessage(promise, sender.getHost(), sender.getProposerPort());
         }
     }
     
@@ -66,35 +83,41 @@ public class PaxosAcceptor extends PaxosParticipant {
      *
      * @param acceptMessage The accept message received from a proposer.
      */
-    public void onAcceptRequest(PaxosMessage acceptMessage) {
-        logger.info("Received accept request with proposal number: " + acceptMessage.getProposalNumber() + " and value: " + acceptMessage.getValue());
+    public void onAcceptRequest(PaxosMessage acceptMessage, String participantID) {
+        Node sender = this.findNodeByID(participantID);
+        logger.info("NODE " + serverNode.getNodeName() + ": " + "Received accept request with proposal number: " + acceptMessage.getProposalNumber() + " and value: " + acceptMessage.getValue() + " from proposer " + participantID);
         if (acceptMessage.getProposalNumber() >= highestPrepareNumber) {
             acceptedProposalNumber = acceptMessage.getProposalNumber();
             acceptedValue = acceptMessage.getValue();
-
+            
             // Send an accepted message to indicate the proposal has been accepted
-            PaxosMessage accepted = new PaxosMessage(PaxosMessage.MessageType.ACCEPTED, acceptMessage.getProposalNumber(), acceptedValue);
+            logger.info("NODE " + serverNode.getNodeName() + ": " + "Sending accepted message with proposal number: " + acceptMessage.getProposalNumber() + " and value: " + acceptMessage.getValue() + " to proposer " + participantID);
+            PaxosMessage accepted = PaxosMessage.acceptedMessage(acceptMessage.getProposalNumber(), acceptMessage.getValue(), participantID);
             // Broadcast the accepted message to all learners (or to the proposer, who will then inform the learners)
+            sendMessage(accepted, sender.getHost(), sender.getProposerPort());
             // This is simplified; in an actual implementation, you might send it to a specific set of nodes.
-            for (Node node : this.nodes) {
-                sendMessage(accepted, node);
-            }
+            // for (Node node : this.nodes) {
+            //     sendMessage(accepted, sender.getHost(), sender.getAcceptorPort());
+            // }
         }
     }
 
     @Override
-    public void receiveMessage(PaxosMessage message) {
+    public void receiveMessage(PaxosMessage message, String participantID) {
         // Handle received Paxos messages
         switch (message.getType()) {
             case PREPARE:
-                onPrepareRequest(message);
+                onPrepareRequest(message, participantID);
                 break;
             case ACCEPT:
-                onAcceptRequest(message);
+                onAcceptRequest(message, participantID);
                 break;
             default:
-                logger.warning("Received unsupported message type: " + message.getType());
+                logger.warning("NODE " + serverNode.getNodeName() + ": " + "Received unsupported message type: " + message.getType());
         }
     }
     
+    public String getAcceptedValue() {
+        return acceptedValue;
+    }
 }

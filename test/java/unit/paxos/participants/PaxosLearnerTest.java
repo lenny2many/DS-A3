@@ -13,12 +13,12 @@ public class PaxosLearner extends PaxosParticipant {
     private Map<String, Integer> acceptedValuesCount = new HashMap<>();
     private String learnedValue = null; // The value that has been learned (chosen).
 
-    public PaxosLearner(int serverPort, int clientPort, List<Node> nodes) {
-        super(serverPort, clientPort, nodes);
+    public PaxosLearner(int serverPort, List<Node> nodes) {
+        super(serverPort, nodes);
     }
 
-    public PaxosLearner(int serverPort, int clientPort, List<Node> nodes, NetworkServer server, MessageQueue messageQueue) {
-        super(serverPort, clientPort, nodes, server, messageQueue);
+    public PaxosLearner(int serverPort, List<Node> nodes, NetworkServer server, MessageQueue messageQueue) {
+        super(serverPort, nodes, server, messageQueue);
     }
 
     /**

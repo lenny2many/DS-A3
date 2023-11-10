@@ -2,6 +2,7 @@ BINSRC = ./bin/src
 LOGLIB = ./lib/logging/*
 TESTLIB = ./lib/testing/*
 SRCJFLAGS = -cp $(BINSRC):$(LOGLIB)
+TESTJFLAGS = -cp $(TESTLIB):$(BINSRC)
 
 SRCDIR = ./src/main/java
 
@@ -10,7 +11,7 @@ INTEGRATIONDIR = test/integration
 
 all: compile
 
-compile: create_bin compile_paxos
+compile: create_bin compile_paxos compile_adelaidesuburbs
 
 create_bin:
 	mkdir -p bin
@@ -20,7 +21,7 @@ create_bin:
 	mkdir -p bin/test/integration/
 
 compile_adelaidesuburbs: create_bin
-	javac $(SRCJFLAGS) -d ./bin/src/ $(SRCDIR)/adelaidesuburbs/App.java
+	javac $(SRCJFLAGS):$(SRCDIR) -d ./bin/src/ $(SRCDIR)/adelaidesuburbs/App.java
 
 compile_paxos: compile_paxos_src compile_paxos_test
 
@@ -29,38 +30,38 @@ compile_paxos: compile_paxos_src compile_paxos_test
 compile_paxos_src: compile_paxos_participant compile_paxos_proposer compile_paxos_acceptor compile_paxos_learner compile_paxos_message
 
 compile_paxos_participant: create_bin
-	javac -cp ./lib/logging/*:$(SRCDIR) -d ./bin/src/ $(SRCDIR)/paxos/participants/PaxosParticipant.java
+	javac $(SRCJFLAGS) -d ./bin/src/ $(SRCDIR)/paxos/participants/PaxosParticipant.java
 
 compile_paxos_proposer: create_bin
-	javac -cp ./lib/logging/*:$(SRCDIR) -d ./bin/src/ $(SRCDIR)/paxos/participants/PaxosProposer.java
+	javac $(SRCJFLAGS) -d ./bin/src/ $(SRCDIR)/paxos/participants/PaxosProposer.java
 
 compile_paxos_acceptor: create_bin
-	javac -cp ./lib/logging/*:$(SRCDIR) -d ./bin/src/ $(SRCDIR)/paxos/participants/PaxosAcceptor.java
+	javac $(SRCJFLAGS) -d ./bin/src/ $(SRCDIR)/paxos/participants/PaxosAcceptor.java
 
 compile_paxos_learner: create_bin
-	javac -cp ./lib/logging/*:$(SRCDIR) -d ./bin/src/ $(SRCDIR)/paxos/participants/PaxosLearner.java
+	javac $(SRCJFLAGS) -d ./bin/src/ $(SRCDIR)/paxos/participants/PaxosLearner.java
 
 compile_paxos_message: create_bin
-	javac -cp ./lib/logging/*:$(SRCDIR) -d ./bin/src/ $(SRCDIR)/paxos/messages/PaxosMessage.java
+	javac $(SRCJFLAGS) -d ./bin/src/ $(SRCDIR)/paxos/messages/PaxosMessage.java
 
 
 # Test targets
 compile_paxos_test: compile_paxos_test_participant compile_paxos_test_proposer compile_paxos_test_acceptor compile_paxos_test_learner compile_paxos_test_message
 
 compile_paxos_test_participant: create_bin compile_paxos_participant
-	javac -cp $(TESTLIB):$(BINSRC) -d ./bin/test/unit $(UNITDIR)/paxos/participants/PaxosParticipantTest.java
+	javac -cp $(TESTJFLAGS) -d ./bin/test/unit $(UNITDIR)/paxos/participants/PaxosParticipantTest.java
 
 compile_paxos_test_proposer: create_bin compile_paxos_proposer
-	javac -cp $(TESTLIB):$(BINSRC) -d ./bin/test/unit $(UNITDIR)/paxos/participants/PaxosProposerTest.java
+	javac -cp $(TESTJFLAGS) -d ./bin/test/unit $(UNITDIR)/paxos/participants/PaxosProposerTest.java
 
 compile_paxos_test_acceptor: create_bin compile_paxos_acceptor
-	javac -cp $(TESTLIB):$(BINSRC) -d ./bin/test/unit $(UNITDIR)/paxos/participants/PaxosAcceptorTest.java
+	javac -cp $(TESTJFLAGS) -d ./bin/test/unit $(UNITDIR)/paxos/participants/PaxosAcceptorTest.java
 
 compile_paxos_test_learner: create_bin compile_paxos_learner
-	javac -cp $(TESTLIB):$(BINSRC) -d ./bin/test/unit $(UNITDIR)/paxos/participants/PaxosLearnerTest.java
+	javac -cp $(TESTJFLAGS) -d ./bin/test/unit $(UNITDIR)/paxos/participants/PaxosLearnerTest.java
 
 compile_paxos_test_message: create_bin compile_paxos_message
-	javac -cp $(TESTLIB):$(BINSRC) -d ./bin/test/unit $(UNITDIR)/paxos/messages/PaxosMessageTest.java
+	javac -cp $(TESTJFLAGS) -d ./bin/test/unit $(UNITDIR)/paxos/messages/PaxosMessageTest.java
 
 test_paxos_unit_participant: compile_paxos_test_participant
 	java -cp $(TESTLIB):./bin/test/unit/:$(BINSRC) org.junit.runner.JUnitCore paxos.participants.PaxosParticipantTest
@@ -77,6 +78,10 @@ test_paxos_unit_learner: compile_paxos_test_learner
 test_paxos_unit_message: compile_paxos_test_message
 	java -cp $(TESTLIB):./bin/test/unit/:$(BINSRC) org.junit.runner.JUnitCore paxos.messages.PaxosMessageTest
 
+
+# Run targets
+run_council_election: compile_adelaidesuburbs
+	java $(SRCJFLAGS) adelaidesuburbs.App
 
 # Clean targets
 clean:

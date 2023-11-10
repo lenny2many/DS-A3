@@ -1,5 +1,6 @@
 package paxos.participants;
 
+import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -7,6 +8,7 @@ import java.util.logging.*;
 
 import paxos.messages.*;
 import paxos.network.*;
+import paxos.network.MessageQueue.ClientMessage;
 
 /**
  * Represents the interface of a Paxos Participant.
@@ -16,6 +18,7 @@ import paxos.network.*;
  */
 public abstract class PaxosParticipant {
     protected NetworkServer server;
+    protected Node serverNode;
     protected List<Node> nodes = new ArrayList<>();
     protected MessageQueue messageQueue;
     private Thread messageProcessingThread;
@@ -28,15 +31,8 @@ public abstract class PaxosParticipant {
      * @param clientPort The port for sending messages.
      * @param nodes The list of nodes that this participant is connected to.
      */
-    public PaxosParticipant(int serverPort, int clientPort, List<Node> nodes) {
-        // Message queue for receiving messages
-        this.messageQueue = new MessageQueue();
-        // Server for receiving messages
-        this.server = new NetworkServer(serverPort, this.messageQueue);
-        // Retain list of nodes that this participant is connected to
-        this.nodes = nodes;
-        // start server and message processing thread
-        this.start();
+    public PaxosParticipant(Node serverNode, List<Node> nodes) {
+        
     }
 
     /**
@@ -46,7 +42,7 @@ public abstract class PaxosParticipant {
      * @param nodes The list of nodes that this participant is connected to.
      * @param server The server for receiving messages.
      */
-    public PaxosParticipant(int serverPort, int clientPort, List<Node> nodes, NetworkServer server, MessageQueue messageQueue) {
+    public PaxosParticipant(int serverPort, List<Node> nodes, NetworkServer server, MessageQueue messageQueue) {
         this.server = server;
         // Message queue for receiving messages
         this.messageQueue = messageQueue;
@@ -54,30 +50,25 @@ public abstract class PaxosParticipant {
         this.nodes = nodes;
     }
 
-    public void start() {
-        // Start message processing thread
-        this.server.startServer();
-        // Start server thread
-        this.startMessageProcessingThread();
-    }
-
     /**
      * Start a thread to process messages from the message queue.
      */
     public void startMessageProcessingThread() {
-        messageProcessingThread =    new Thread(() -> {
+        messageProcessingThread = new Thread(() -> {
             try {
                 while (!Thread.currentThread().isInterrupted()) {
                     // Wait for a message to be added to the queue
-                    String messageString = this.messageQueue.consumeMessage();
+                    ClientMessage clientMessage = messageQueue.consumeMessage();
+                    String message = clientMessage.getMessage();
+                    // Socket clientSocket = clientMessage.getClientSocket();
                     // Parse the message
-                    Optional<PaxosMessage> messageOpt = PaxosMessage.parseMessageFromString(messageString);
+                    Optional<PaxosMessage> messageOpt = PaxosMessage.parseMessageFromString(message);
                     if (messageOpt.isPresent()) {
                         PaxosMessage paxosMessage = messageOpt.get();
                         // Process the message
-                        this.receiveMessage(paxosMessage);
+                        this.receiveMessage(paxosMessage, paxosMessage.getParticipantID());
                     } else {
-                        logger.warning("Failed to parse message: " + messageString);
+                        logger.warning("Failed to parse message: " + message);
                     }
                 }
             } catch (InterruptedException e) {
@@ -101,34 +92,64 @@ public abstract class PaxosParticipant {
         }
     }
 
-    public abstract void receiveMessage(PaxosMessage message);
+    public abstract void receiveMessage(PaxosMessage message, String participantID);
 
     /**
      * Send message to another participant.
      * @param message The PaxosMessage to be sent.
      */
-    public void sendMessage(PaxosMessage message, Node node) {
-        String host = node.getHost();
-        int port = node.getPort();
+    public void sendMessage(PaxosMessage message, String host, int port) {
+        // logger.info("Sending message: " + message.toString() + " to " + host + ":" + port);
+
         NetworkClient.sendMessage(message.toString(), host, port);
+    }
+
+    public void setConnectedNodes(List<Node> nodes) {
+        this.nodes = nodes;
+    }
+
+    public String getServerNodeID() {
+        return this.serverNode.getNodeName();
+    }
+
+    public Node findNodeByID(String nodeName) {
+        for (Node node : this.nodes) {
+            if (node.getNodeName().equals(nodeName)) {
+                return node;
+            }
+        }
+
+        return null;
     }
 
     // Node class to hold information about each node
     public static class Node {
+        private String nodeName;
         private String host;
-        private int port;
+        private int acceptorPort;
+        private int proposerPort;
 
-        public Node(String host, int port) {
+        public Node(String nodeName, String host, int acceptorPort, int proposerPort) {
+            this.nodeName = nodeName;
             this.host = host;
-            this.port = port;
+            this.acceptorPort = acceptorPort;
+            this.proposerPort = proposerPort;
         }
 
         public String getHost() {
             return host;
         }
 
-        public int getPort() {
-            return port;
+        public int getAcceptorPort() {
+            return acceptorPort;
+        }
+
+        public int getProposerPort() {
+            return proposerPort;
+        }
+
+        public String getNodeName() {
+            return nodeName;
         }
     }
 }
